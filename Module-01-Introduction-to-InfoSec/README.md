@@ -21,6 +21,8 @@ Based on three main components:
 - Technology → Firewalls, IDS/IPS, encryption  
 
  Strong security = combination of all three
+<img width="4189" height="2085" alt="image" src="https://github.com/user-attachments/assets/76c9e79f-8ccd-4d60-bd05-81a241353331" />
+source:- https://academy.hackthebox.com/course/preview/introduction-to-information-security
 
 ---
 

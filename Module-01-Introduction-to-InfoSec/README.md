@@ -92,7 +92,7 @@ From this module, I understood how cybersecurity works as a complete system invo
 
 ##  Notes
 Full detailed notes are available here:
- `Module-01-Introduction-to-InfoSec/Module 1 (HTB Certified Junior Cybersecurity Associate)45.pdf`
+ `[Module-01-Introduction-to-InfoSec/Module 1 (HTB Certified Junior Cybersecurity Associate)45.pdf](https://github.com/manishburdak45/Junior-Cybersecurity-Analyst/blob/main/Module-01-Introduction-to-InfoSec/Module%201%20(HTB%20Certified%20Junior%20Cybersecurity%20Associate)45.pdf)`
 
 ---
 

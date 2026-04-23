@@ -1,3 +1,5 @@
+<img width="1122" height="1402" alt="image" src="https://github.com/user-attachments/assets/e61f4d07-d365-4ea1-8434-cc31838dc5cb" />
+
 #  HTB Junior Cybersecurity Analyst Journey
 
 This repository documents my learning journey through the HTB (Hack The Box) **Junior Cybersecurity Analyst** path.

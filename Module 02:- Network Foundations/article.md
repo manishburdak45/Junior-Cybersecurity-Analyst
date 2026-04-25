@@ -151,6 +151,135 @@ The domain is converted to an IP address using DNS, the request is sent through 
 
 ---
 
-## Next Update
+## Part 2: DHCP and NAT
 
-I will continue this article with Part 2 and add more advanced concepts as I progress through the module.
+In this part of the module, I focused on understanding how devices get IP addresses and how they communicate with the internet.
+
+---
+
+### Understanding DHCP
+
+I learned that DHCP is responsible for automatically assigning IP addresses to devices.
+
+Earlier, I thought IPs were manually configured, but this part made it clear that DHCP handles everything in the background.
+
+It assigns:
+
+* IP address
+* Subnet mask
+* Gateway
+* DNS
+
+This makes network management much easier.
+
+---
+
+### Why DHCP is Needed
+
+Without DHCP:
+
+* Every device needs manual configuration
+* IP conflicts can happen
+* Managing large networks becomes difficult
+
+With DHCP:
+
+* IP assignment is automatic
+* No conflicts
+* Easy scalability
+
+---
+
+### DORA Process
+
+One of the most interesting concepts was the DORA process.
+
+When a device connects to a network:
+
+1. It sends a Discover message
+2. Server responds with an Offer
+3. Device sends a Request
+4. Server sends an Acknowledge
+
+This entire process happens within seconds.
+
+---
+
+### IP Lease Concept
+
+I learned that IP addresses are assigned temporarily.
+
+Devices must renew their lease after some time. If they don’t, the IP is released and assigned to another device.
+
+---
+
+### Understanding NAT
+
+NAT was another important concept.
+
+It allows multiple devices in a private network to share a single public IP address.
+
+This solved my confusion about how multiple devices in a home network access the internet using one connection.
+
+---
+
+### Public vs Private IP
+
+I clearly understood that:
+
+* Private IPs are used inside local networks
+* Public IPs are used on the internet
+
+Private IPs are not directly accessible from outside.
+
+---
+
+### How NAT Works in Real Life
+
+When a device sends a request:
+
+* Router replaces the private IP with its public IP
+* Stores mapping in a NAT table
+* When response comes back, it forwards it to the correct device
+
+This process happens continuously.
+
+---
+
+### Types of NAT
+
+I learned three types:
+
+* Static NAT for fixed mapping
+* Dynamic NAT using a pool
+* PAT where multiple devices share one public IP
+
+PAT is what is commonly used in home networks.
+
+---
+
+### My Understanding
+
+This part helped me understand that:
+
+* DHCP handles IP assignment
+* NAT handles internet communication
+
+Both work together to make networking seamless.
+
+---
+
+### Key Takeaways from Part 2
+
+* IP assignment is automatic through DHCP
+* DORA explains the full process
+* NAT allows multiple devices to share one public IP
+* Private IPs are hidden from the internet
+* Networking is more automated than it appears
+
+---
+
+### Next Update
+
+I will continue adding more concepts as I move forward in the module.
+

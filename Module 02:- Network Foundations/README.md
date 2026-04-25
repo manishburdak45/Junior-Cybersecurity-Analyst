@@ -214,3 +214,156 @@ Detailed notes are available in:
 ## Next Step
 
 In the next part, I will go deeper into networking concepts and how they are used in real-world security scenarios.
+# Module 02: Network Foundations (Part 2 — DHCP & NAT)
+
+## Overview
+
+In this part of the module, I focused on two very important networking concepts: DHCP and NAT.
+
+These concepts helped me understand how devices get IP addresses automatically and how private networks communicate with the internet using a single public IP.
+
+---
+
+## DHCP (Dynamic Host Configuration Protocol)
+
+I learned that DHCP is used to automatically assign IP addresses and other network configurations to devices.
+
+Without DHCP, every device would need manual configuration, which is not practical in large networks.
+
+### Key Points I Understood
+
+* Automatically assigns IP addresses
+* Prevents IP conflicts
+* Reuses unused IPs
+* Provides additional configuration (DNS, gateway, subnet)
+
+---
+
+## DHCP Roles
+
+There are two main components:
+
+* DHCP Server → manages IP pool and assigns addresses
+* DHCP Client → requests and receives IP configuration
+
+Example: A home router usually acts as a DHCP server.
+
+---
+
+## DORA Process
+
+One of the most important concepts I learned is how DHCP assigns IPs using 4 steps:
+
+* Discover → client looks for DHCP server
+* Offer → server offers an IP address
+* Request → client requests that IP
+* Acknowledge → server confirms assignment
+
+This process happens automatically when a device connects to a network.
+
+---
+
+## IP Lease and Renewal
+
+I understood that IP addresses are not permanent.
+
+* Devices get IPs for a limited time (lease)
+* They must renew before expiry
+* If not renewed, IP is returned to the pool
+
+---
+
+## NAT (Network Address Translation)
+
+I learned that NAT is used to translate private IP addresses into a public IP address.
+
+This allows multiple devices in a local network to share a single public IP.
+
+---
+
+## Why NAT is Important
+
+NAT solves the IPv4 address shortage problem.
+
+Since public IPs are limited, NAT allows:
+
+* Multiple devices to use one public IP
+* Better IP management
+* Additional security by hiding internal network
+
+---
+
+## Public vs Private IP
+
+I understood the difference:
+
+* Public IP → globally unique, accessible from internet
+* Private IP → used inside local networks
+
+Private IP ranges are defined and cannot be accessed directly from the internet.
+
+---
+
+## How NAT Works
+
+When a device sends a request:
+
+* Private IP is converted into a public IP by the router
+* NAT table stores the mapping
+* Response is mapped back to the original device
+
+---
+
+## Types of NAT
+
+I learned three types:
+
+* Static NAT → one-to-one mapping
+* Dynamic NAT → uses a pool of public IPs
+* PAT (NAT Overload) → multiple devices share one public IP using ports
+
+PAT is the most commonly used type in home networks.
+
+---
+
+## NAT Advantages and Limitations
+
+### Advantages
+
+* Saves public IP addresses
+* Adds a layer of security
+* Allows flexible internal addressing
+
+### Limitations
+
+* Makes troubleshooting harder
+* Breaks some protocols
+* Requires extra configuration for hosting servers
+
+---
+
+## DHCP vs NAT
+
+I clearly understood the difference:
+
+* DHCP → assigns IP addresses
+* NAT → translates IP addresses
+
+Both are essential for modern networking.
+
+---
+
+## Key Takeaways
+
+* DHCP automates IP assignment
+* DORA is the process behind DHCP
+* NAT enables internet access using a single public IP
+* Private IPs remain hidden from the internet
+* PAT is the most commonly used NAT type
+
+---
+
+## Notes
+
+Detailed notes are available in:
+`Module 2 (Network_foundation) part 2`

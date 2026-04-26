@@ -366,4 +366,204 @@ Both are essential for modern networking.
 ## Notes
 
 Detailed notes are available in:
-`Module 2 (Network_foundation) part 2`
+`Module 2 part 2 `
+
+# Module 02: Network Foundations (Part 3 — DNS & Internet Architecture)
+
+## Overview
+
+In this part of the module, I learned how domain names are translated into IP addresses using DNS and how different internet architectures work.
+
+This helped me understand what happens behind the scenes when we access a website and how modern systems are designed.
+
+---
+
+## DNS (Domain Name System)
+
+I learned that DNS works like a translator between human-readable domain names and machine-readable IP addresses.
+
+Instead of remembering IP addresses, we use domain names, and DNS resolves them.
+<img width="672" height="352" alt="image" src="https://github.com/user-attachments/assets/0240b445-92ac-42cd-8645-2e8df7b93839" />
+https://academy.hackthebox.com
+---
+
+## Domain Names vs IP Addresses
+
+* Domain names are easy for humans to remember
+* IP addresses are used by machines for communication
+
+DNS connects both by translating names into IP addresses.
+
+---
+
+## DNS Hierarchy
+
+I understood that DNS works in a hierarchical structure:
+
+* Root Servers
+* Top-Level Domains (TLDs like .com, .org)
+* Second-Level Domains (example.com)
+* Subdomains (www, mail, etc.)
+
+---
+
+## DNS Resolution Process
+
+When a user enters a domain:
+
+1. Browser checks local cache
+2. Request goes to recursive DNS server
+3. Root server is queried
+4. TLD server is contacted
+5. Authoritative server returns IP
+6. Browser connects to the website
+
+This entire process happens very quickly.
+<img width="1347" height="625" alt="image" src="https://github.com/user-attachments/assets/0c0273f3-7665-459a-a0de-a01900e5fcd7" />
+https://academy.hackthebox.com
+---
+
+## Internet Architecture Overview
+
+I studied different types of architectures used in networking:
+
+* Peer-to-Peer (P2P)
+* Client-Server
+* Hybrid
+* Cloud
+* Software-Defined Networking (SDN)
+
+Each has different use cases and trade-offs.
+
+---
+
+## Peer-to-Peer (P2P)
+
+* Devices act as both client and server
+* No central authority
+* Used in file sharing and blockchain
+
+### Advantages
+
+* Scalable
+* No single point of failure
+
+### Disadvantages
+
+* Hard to manage
+* Security risks
+
+---
+
+## Client-Server Architecture
+
+* Clients send requests
+* Servers respond with data
+
+Used in websites, email systems, and applications.
+
+### Advantages
+
+* Centralized control
+* Better security management
+
+### Disadvantages
+
+* Single point of failure
+* High cost and maintenance
+
+---
+
+## Tier Models
+
+I learned about different layers in client-server systems:
+
+* Single-tier
+* Two-tier
+* Three-tier
+* N-tier
+
+More tiers improve scalability and separation of responsibilities.
+
+---
+
+## Hybrid Architecture
+
+Combines client-server and P2P.
+
+* Central server handles control
+* Data transfer can happen between peers
+
+Used in video conferencing and messaging systems.
+
+---
+
+## Cloud Architecture
+
+Cloud services are provided over the internet by third-party providers.
+
+Examples include AWS, Azure, and Google Cloud.
+
+### Advantages
+
+* Scalable
+* Flexible
+* No need to manage hardware
+
+### Disadvantages
+
+* Dependency on provider
+* Requires stable internet
+
+---
+
+## Cloud Characteristics
+
+I learned five key features:
+
+* On-demand self-service
+* Broad network access
+* Resource pooling
+* Rapid elasticity
+* Measured service
+
+---
+
+## Software-Defined Networking (SDN)
+
+SDN separates control and data planes.
+
+* Control plane decides routing
+* Data plane forwards traffic
+
+This makes networks programmable and easier to manage.
+
+---
+
+## Architecture Comparison
+
+I understood that:
+
+* P2P is decentralized
+* Client-server is centralized
+* Hybrid combines both
+* Cloud is provider-managed
+* SDN is software-controlled
+
+---
+
+## Key Takeaways
+
+* DNS translates domain names into IP addresses
+* DNS works through a hierarchical system
+* Internet uses multiple architectures
+* Each architecture has advantages and trade-offs
+* Understanding architecture is important for cybersecurity
+
+---
+
+## Notes
+
+Detailed notes are available in:
+`module 2 part 3 .pdf`
+

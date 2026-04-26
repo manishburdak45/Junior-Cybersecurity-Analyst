@@ -279,7 +279,136 @@ Both work together to make networking seamless.
 
 ---
 
+## Part 3: DNS and Internet Architecture
+
+In this part, I learned how websites are actually accessed using DNS and how different types of network architectures are designed.
+
+---
+
+### Understanding DNS
+
+I learned that DNS works like a system that converts domain names into IP addresses.
+
+Before this, I only knew that typing a domain opens a website, but now I understand that DNS is responsible for finding the correct IP behind that domain.
+
+---
+
+### Domain vs IP Address
+
+Domain names are easy to remember, while IP addresses are used by machines.
+
+DNS acts as a bridge between these two.
+
+---
+
+### DNS Hierarchy
+
+I understood that DNS follows a structured hierarchy:
+
+* Root servers
+* TLD servers
+* Authoritative servers
+
+Each level helps in finding the correct IP address.
+
+---
+
+### DNS Resolution Process
+
+When a user enters a website:
+
+* The system checks local cache
+* If not found, request goes to DNS server
+* It queries root, then TLD, then authoritative server
+* Finally, IP address is returned
+
+This entire process happens very quickly.
+
+---
+
+### Understanding Internet Architectures
+
+This part introduced different ways systems are designed.
+
+---
+
+### Peer-to-Peer Architecture
+
+In P2P, devices communicate directly with each other.
+
+There is no central server, and each device can act as both client and server.
+
+This is useful but difficult to manage and secure.
+
+---
+
+### Client-Server Architecture
+
+In this model, clients send requests and servers respond.
+
+This is the most commonly used architecture on the internet.
+
+It provides better control but depends heavily on servers.
+
+---
+
+### Hybrid Architecture
+
+Hybrid combines both P2P and client-server.
+
+It uses central control but allows direct communication between devices.
+
+---
+
+### Cloud Architecture
+
+I learned that cloud computing allows users to access services over the internet without managing hardware.
+
+It provides flexibility and scalability.
+
+---
+
+### Cloud Characteristics
+
+Some important characteristics include:
+
+* On-demand access
+* Resource sharing
+* Scalability
+* Pay-as-you-use model
+
+---
+
+### Software-Defined Networking (SDN)
+
+SDN separates control logic from actual data transfer.
+
+This allows networks to be controlled through software, making them more flexible.
+
+---
+
+### My Understanding
+
+This part helped me understand that:
+
+* DNS is essential for accessing websites
+* Internet architecture defines how systems communicate
+* Different architectures are used based on requirements
+
+---
+
+### Key Takeaways from Part 3
+
+* DNS translates domain names into IP addresses
+* DNS works through multiple layers
+* P2P is decentralized while client-server is centralized
+* Cloud provides scalable infrastructure
+* SDN introduces programmability in networks
+
+---
+
 ### Next Update
 
-I will continue adding more concepts as I move forward in the module.
+I will continue updating this article as I move forward in the module.
+
 

@@ -406,9 +406,125 @@ This part helped me understand that:
 * SDN introduces programmability in networks
 
 ---
+## Part 4: Network Security and Wireless Networks
+
+In this part, I learned how networks are protected and how wireless communication introduces both convenience and risks.
+
+---
+
+### Understanding Network Security
+
+I understood that network security is not just about blocking attacks, but about protecting data, systems, and users using multiple layers of defense.
+
+It includes controlling access, monitoring activity, and securing communication.
+
+---
+
+### CIA Triad in Practice
+
+This part reinforced the importance of confidentiality, integrity, and availability.
+
+Every security decision is connected to one of these three principles.
+
+---
+
+### Wireless Networks
+
+I learned that wireless communication uses radio waves, which makes it flexible but also less secure than wired networks.
+
+Signals can travel through walls, which increases the risk of interception.
+
+---
+
+### Wireless Trade-offs
+
+* 2.4 GHz provides better coverage but more interference
+* 5 GHz provides better speed but shorter range
+
+Choosing the right band depends on the use case.
+
+---
+
+### Wireless Devices
+
+I understood how different devices work:
+
+* Routers manage traffic and provide connectivity
+* Mobile hotspots share internet from cellular networks
+* Cell towers connect large areas
+
+---
+
+### Firewalls
+
+I learned that firewalls act as the first line of defense.
+
+They filter traffic based on rules and can operate at different layers of the network.
+
+Advanced firewalls can inspect actual data and detect threats.
+
+---
+
+### IDS vs IPS
+
+This was an important concept:
+
+* IDS monitors and alerts
+* IPS actively blocks attacks
+
+Both are used together in real environments.
+
+---
+
+### Detection Methods
+
+I learned that systems can detect attacks using:
+
+* Known signatures
+* Behavioral anomalies
+
+Each method has its strengths and limitations.
+
+---
+
+### Security Best Practices
+
+This part highlighted that security is not about one tool but a complete strategy.
+
+Important practices include:
+
+* Limiting user access
+* Keeping systems updated
+* Monitoring logs
+* Using layered defense
+* Testing security regularly
+
+---
+
+### My Understanding
+
+This part made me realize that:
+
+* Security is a continuous process
+* Wireless networks increase risk if not secured properly
+* Tools like firewalls and IPS are only effective when configured correctly
+* Real security comes from combining multiple techniques
+
+---
+
+### Key Takeaways from Part 4
+
+* Network security is based on layers
+* Wireless networks are convenient but vulnerable
+* Firewalls control traffic flow
+* IDS and IPS serve different roles
+* Security depends on both tools and proper configuration
+
+---
 
 ### Next Update
 
-I will continue updating this article as I move forward in the module.
+I will continue updating this article as I progress further.
+
 
 

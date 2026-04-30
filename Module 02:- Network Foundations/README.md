@@ -567,3 +567,139 @@ I understood that:
 Detailed notes are available in:
 `module 2 part 3 .pdf`
 
+# Module 02: Network Foundations (Part 4 — Network Security & Wireless Networks)
+
+## Overview
+
+In this part of the module, I learned how networks are protected using different security mechanisms and how wireless communication works along with its risks.
+
+This part connected networking concepts with real-world security practices.
+
+---
+
+## What is Network Security
+
+I learned that network security is about protecting data, devices, and users within a network.
+
+It involves:
+
+* Access control
+* Data protection
+* Monitoring and detection
+<img width="288" height="175" alt="image" src="https://github.com/user-attachments/assets/a1f4112b-6f7c-4916-8b49-1c30b6f3eb72" />
+
+It works like a layered defense system.
+
+---
+
+## CIA Triad in Network Security
+
+Network security is based on:
+
+* Confidentiality → only authorized access
+* Integrity → data should not be altered
+* Availability → systems should remain accessible
+<img width="290" height="174" alt="image" src="https://github.com/user-attachments/assets/7d018ab2-3d5e-4990-93ce-b889b6276e5f" />
+
+---
+
+## Wireless Networks
+
+Wireless networks allow devices to communicate without cables using radio signals.
+<img width="300" height="168" alt="image" src="https://github.com/user-attachments/assets/928f5554-4126-41a7-b664-dd174d4d284a" />
+
+### Advantages
+
+* Mobility
+* Easy setup
+* Scalability
+
+### Disadvantages
+
+* Interference
+* Security risks
+* Slower than wired
+
+---
+
+## Wireless Frequency Bands
+
+I understood different bands:
+
+* 2.4 GHz → longer range but more interference
+* 5 GHz → faster speed but shorter range
+* Cellular → wide coverage using towers
+<img width="352" height="143" alt="image" src="https://github.com/user-attachments/assets/46cd1a3c-636b-443b-a7e2-1a8645d5811e" />
+
+---
+
+## Key Wireless Devices
+
+* Router → manages traffic and provides Wi-Fi
+* Mobile Hotspot → shares cellular internet
+* Cell Tower → connects devices to telecom network
+
+---
+
+## Firewalls
+
+I learned that a firewall controls incoming and outgoing traffic based on rules.
+
+Types include:
+
+* Packet Filtering → basic filtering using IP and ports
+* Stateful Inspection → tracks connections
+* Application Layer Firewall → inspects content
+* Next-Gen Firewall → advanced inspection and threat detection
+<img width="303" height="166" alt="image" src="https://github.com/user-attachments/assets/ea4bf1a8-804d-4061-a272-d646dd4e1190" />
+
+---
+
+## IDS vs IPS
+
+I understood the difference:
+
+* IDS → detects and alerts
+* IPS → actively blocks threats
+
+Both are important for monitoring and protection.
+<img width="264" height="191" alt="image" src="https://github.com/user-attachments/assets/e092ef6a-fcac-4d73-862b-91cffd58d007" />
+
+---
+
+## Detection Techniques
+
+* Signature-based → detects known attacks
+* Anomaly-based → detects unusual behavior
+* Network vs Host-based systems
+
+---
+
+## Security Best Practices
+
+I learned important practices:
+
+* Principle of Least Privilege
+* Regular updates and patching
+* Monitoring and logging
+* Defense in depth
+* Penetration testing
+
+---
+
+## Key Takeaways
+
+* Network security uses layered defense
+* Wireless networks are convenient but risky
+* Firewalls control traffic
+* IDS detects while IPS prevents
+* Security requires continuous monitoring
+
+---
+
+## Notes
+
+Detailed notes are available in:
+`notes.pdf`
+
+

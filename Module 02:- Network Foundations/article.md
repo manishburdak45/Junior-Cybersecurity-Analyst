@@ -522,9 +522,148 @@ This part made me realize that:
 
 ---
 
-### Next Update
+## Final Part: Practical Networking and Skills Assessment
 
-I will continue updating this article as I progress further.
+In the final part of this module, I applied all the networking concepts in a hands-on lab environment using HTB Pwnbox.
+
+This helped me move from theoretical understanding to practical implementation.
+
+---
+
+### Working with Network Interfaces
+
+I learned how to inspect network interfaces using commands like ifconfig.
+
+I understood the difference between:
+
+* ens3 (main network interface)
+* lo (loopback)
+* tun0 (VPN interface)
+
+This helped me see how systems are connected in real environments.
+
+---
+
+### Understanding Loopback
+
+I learned that 127.0.0.1 is used for internal communication.
+
+It is useful for:
+
+* Local testing
+* Running internal services
+* Securing sensitive applications
+
+---
+
+### Checking Open Ports
+
+Using netstat, I learned how to identify:
+
+* Which services are running
+* Which ports are open
+* Which processes are listening
+
+This is important for both security analysis and troubleshooting.
+
+---
+
+### VPN and tun0
+
+I understood how VPN creates a secure tunnel using the tun0 interface.
+
+This allows access to remote lab machines as if they are on the same network.
+
+---
+
+### Testing Connectivity
+
+Using ping, I learned how to:
+
+* Check if a system is reachable
+* Measure latency
+* Understand network performance
+
+---
+
+### Port Scanning with nmap
+
+I used nmap to scan target systems and identify open ports.
+
+This helped me understand:
+
+* Which services are exposed
+* Possible attack surfaces
+
+---
+
+### Interacting with Protocols
+
+I manually interacted with services using netcat.
+
+#### FTP
+
+* Logged in using anonymous access
+* Listed files and retrieved data
+
+#### HTTP
+
+* Sent raw HTTP requests
+* Used headers like Host and User-Agent
+* Understood how servers respond
+
+---
+
+### Understanding Data Flow
+
+I learned the complete journey of data:
+
+* DHCP assigns IP
+* DNS resolves domain
+* Request is created
+* Data travels through OSI layers
+* NAT translates addresses
+* Server responds
+* Data is rendered
+
+This gave me a full picture of how the internet works.
+
+---
+
+### My Understanding
+
+This part made me realize that:
+
+* Networking is not just theory, it is practical
+* Tools provide visibility into systems
+* Understanding protocols helps in both attack and defense
+* Real cybersecurity starts with understanding how systems communicate
+
+---
+
+### Key Takeaways from Final Part
+
+* Practical skills are essential in cybersecurity
+* Network tools reveal system behavior
+* VPN enables secure remote access
+* Protocols can be tested manually
+* Understanding full data flow is critical
+
+---
+
+### Module 02 Completed
+
+This completes my learning of Network Foundations.
+
+I now have a strong understanding of:
+
+* Networking basics
+* Protocols
+* Security concepts
+* Practical tools
+
+I will build on this in upcoming modules.
+
 
 
 

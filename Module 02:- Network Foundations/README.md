@@ -701,5 +701,173 @@ I learned important practices:
 
 Detailed notes are available in:
 `notes.pdf`
+# Module 02: Network Foundations (Final Part — Practical Networking & Skills Assessment)
+
+## Overview
+
+In this final part of the module, I applied networking concepts in a practical lab environment using HTB Pwnbox.
+
+This section focused on real tools, commands, and how networking works in real scenarios.
+
+---
+
+## Lab Environment
+
+* Platform: HTB Academy (Pwnbox — Parrot OS)
+* Access: Browser-based virtual machine
+* Focus: Real-world networking commands and analysis
+
+---
+
+## Network Interfaces
+
+I learned how to inspect network interfaces using tools like:
+
+* ifconfig
+* ip route
+
+### Key Interfaces
+
+* ens3 → main network interface (public IP)
+* lo → loopback (127.0.0.1)
+* tun0 → VPN interface used to connect to HTB lab
+
+---
+
+## Loopback Interface
+
+I understood that:
+
+* 127.0.0.1 is used for internal communication
+* It never leaves the system
+* Used for local services like databases
+
+---
+
+## Checking Open Ports
+
+Using:
+
+* netstat
+
+I learned how to identify:
+
+* Open ports
+* Listening services
+* Running processes
+
+---
+
+## Port Forwarding
+
+I understood how internal services can be exposed externally using port forwarding.
+
+Example:
+
+* Web browser → HTTP → redirected to internal VNC service
+
+---
+
+## VPN and tun0 Interface
+
+I learned how VPN works using tun0:
+
+* Creates a virtual network interface
+* Allows access to remote lab machines
+* Works like being in the same network
+
+---
+
+## Testing Connectivity
+
+Using:
+
+* ping
+
+I understood:
+
+* Reachability of a system
+* Latency (time delay)
+* Packet loss
+
+---
+
+## Port Scanning
+
+Using:
+
+* nmap
+
+I learned how to:
+
+* Identify open ports
+* Detect services
+* Gather information about a target
+
+---
+
+## Common Open Ports
+
+Examples observed:
+
+* 21 → FTP
+* 80 → HTTP
+* 445 → SMB
+* 3389 → RDP
+
+These help in identifying system behavior.
+
+---
+
+## Protocol Interaction
+
+### FTP
+
+Using netcat:
+
+* Connected to FTP service
+* Used commands like USER, PASS, LIST, RETR
+* Understood control and data channels
+
+---
+
+### HTTP
+
+Using netcat:
+
+* Sent manual HTTP requests
+* Learned headers like Host and User-Agent
+* Understood how servers respond
+
+---
+
+## Data Flow (End-to-End)
+
+I understood how data travels:
+
+1. Device connects to network (DHCP)
+2. DNS resolves domain
+3. Request is created (HTTP)
+4. Data passes through layers (OSI model)
+5. NAT translates IP
+6. Server responds
+7. Data is received and rendered
+
+---
+
+## Key Takeaways
+
+* Networking concepts are best understood through practice
+* Tools like nmap and netstat reveal system details
+* VPN creates secure access to remote networks
+* Protocols like HTTP and FTP can be manually tested
+* Understanding data flow is critical in cybersecurity
+
+---
+
+## Notes
+
+Detailed notes available in:
+`notes.pdf`
 
 

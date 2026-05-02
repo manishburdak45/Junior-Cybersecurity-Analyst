@@ -141,6 +141,7 @@ Some important protocols I studied:
 * DNS → domain resolution
 * TCP → reliable communication
 * UDP → fast but less reliable
+<img width="474" height="292" alt="image" src="https://github.com/user-attachments/assets/a380720a-fb10-4866-9396-a1b274ac0f34" />
 
 ---
 
@@ -150,6 +151,7 @@ I clearly understood the difference:
 
 * TCP → reliable, ordered, slower
 * UDP → fast, no guarantee, used in streaming
+<img width="2000" height="1518" alt="image" src="https://github.com/user-attachments/assets/f72e6e9f-753a-45a5-a971-8cb68f907d34" />
 
 ---
 
@@ -160,7 +162,7 @@ I learned different transmission concepts:
 * Transmission types → analog and digital
 * Modes → simplex, half-duplex, full-duplex
 * Media → wired (Ethernet, fiber) and wireless (Wi-Fi, radio)
-
+ Transmission in Networking
 ---
 
 ## Components of a Network
@@ -171,6 +173,7 @@ From the later part of the module:
 * Intermediary devices → routers, switches
 * Network media → cables, wireless
 * Servers → provide services (web, database, mail)
+<img width="768" height="427" alt="image" src="https://github.com/user-attachments/assets/f0b27ada-311b-4f80-b66a-0dbd4e42593e" />
 
 ---
 

@@ -1,0 +1,8 @@
+You’re right to question it—5901 usually points to VNC, but HTB Pwnbox can name the process differently.
+
+On Pwnbox, the service listening on localhost:5901 is typically:
+If you want to verify it yourself (good practice 👇):
+
+ss -tulnp | grep 5901
+  or
+netstat -tulnp | grep 5901

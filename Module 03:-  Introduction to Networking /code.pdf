@@ -1,0 +1,1046 @@
+const pptxgen = require("pptxgenjs");
+const React = require("react");
+const ReactDOMServer = require("react-dom/server");
+const sharp = require("sharp");
+
+// Icon imports
+const {
+  FaNetworkWired, FaShieldAlt, FaServer, FaLock,
+  FaExclamationTriangle, FaTerminal, FaEye, FaDatabase,
+  FaWifi, FaRoute, FaFireAlt, FaSearch
+} = require("react-icons/fa");
+const { MdSecurity, MdDns, MdRouter } = require("react-icons/md");
+const { BiNetworkChart } = require("react-icons/bi");
+
+async function iconToBase64Png(IconComponent, color, size = 256) {
+  const svg = ReactDOMServer.renderToStaticMarkup(
+    React.createElement(IconComponent, { color, size: String(size) })
+  );
+  const pngBuffer = await sharp(Buffer.from(svg)).png().toBuffer();
+  return "image/png;base64," + pngBuffer.toString("base64");
+}
+
+// COLOR PALETTE - Dark Cybersecurity Theme
+const C = {
+  bg:        "0A0E1A",   // Deep dark navy
+  bg2:       "0D1525",   // Slightly lighter dark
+  panel:     "111827",   // Card background
+  panel2:    "1A2540",   // Lighter panel
+  cyan:      "00D4FF",   // Neon cyan accent
+  cyan2:     "00A8CC",   // Darker cyan
+  cyan3:     "0077AA",   // Muted cyan
+  blue:      "1E40AF",   // Deep blue
+  blue2:     "3B82F6",   // Bright blue
+  green:     "10B981",   // Success green
+  red:       "EF4444",   // Warning red
+  orange:    "F59E0B",   // Alert orange
+  white:     "FFFFFF",
+  gray:      "94A3B8",
+  gray2:     "64748B",
+  gray3:     "334155",
+  teal:      "14B8A6",
+  purple:    "8B5CF6",
+};
+
+async function buildPresentation() {
+  const pres = new pptxgen();
+  pres.layout = "LAYOUT_16x9";
+  pres.title = "Networking Overview for Cybersecurity Beginners";
+  pres.author = "CyberSec Training";
+
+  // Pre-render icons
+  const iconNetwork = await iconToBase64Png(FaNetworkWired, "#00D4FF", 256);
+  const iconShield   = await iconToBase64Png(FaShieldAlt,    "#00D4FF", 256);
+  const iconServer   = await iconToBase64Png(FaServer,       "#00D4FF", 256);
+  const iconLock     = await iconToBase64Png(FaLock,         "#00D4FF", 256);
+  const iconWarn     = await iconToBase64Png(FaExclamationTriangle, "#EF4444", 256);
+  const iconTerm     = await iconToBase64Png(FaTerminal,     "#10B981", 256);
+  const iconEye      = await iconToBase64Png(FaEye,          "#00D4FF", 256);
+  const iconFire     = await iconToBase64Png(FaFireAlt,      "#F59E0B", 256);
+  const iconDns      = await iconToBase64Png(MdDns,          "#00D4FF", 256);
+  const iconRouter   = await iconToBase64Png(MdRouter,       "#00D4FF", 256);
+  const iconSearch   = await iconToBase64Png(FaSearch,       "#00D4FF", 256);
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 1 — TITLE SLIDE
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    // Grid line decorations (subtle)
+    for (let i = 0; i < 8; i++) {
+      s.addShape(pres.shapes.LINE, {
+        x: i * 1.4, y: 0, w: 0, h: 5.625,
+        line: { color: "1E3A5F", width: 0.5, transparency: 60 }
+      });
+    }
+    for (let j = 0; j < 5; j++) {
+      s.addShape(pres.shapes.LINE, {
+        x: 0, y: j * 1.2, w: 10, h: 0,
+        line: { color: "1E3A5F", width: 0.5, transparency: 60 }
+      });
+    }
+
+    // Glowing left accent bar
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: 0, y: 0, w: 0.06, h: 5.625,
+      fill: { color: C.cyan }, line: { color: C.cyan, width: 0 }
+    });
+
+    // Central panel
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: 0.5, y: 0.7, w: 9, h: 4.2,
+      fill: { color: C.panel, transparency: 20 },
+      line: { color: C.cyan3, width: 1 }
+    });
+
+    // Cyan top strip on panel
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: 0.5, y: 0.7, w: 9, h: 0.06,
+      fill: { color: C.cyan }, line: { color: C.cyan, width: 0 }
+    });
+
+    // Module label
+    s.addText("HTB ACADEMY  |  MODULE 01", {
+      x: 0.7, y: 0.9, w: 8.6, h: 0.3,
+      fontSize: 9, color: C.cyan, fontFace: "Consolas",
+      charSpacing: 4, margin: 0
+    });
+
+    // Main title
+    s.addText("NETWORKING OVERVIEW", {
+      x: 0.7, y: 1.35, w: 8.6, h: 0.85,
+      fontSize: 40, color: C.white, fontFace: "Arial Black",
+      bold: true, charSpacing: 2, margin: 0
+    });
+
+    // Subtitle
+    s.addText("for Cybersecurity Beginners", {
+      x: 0.7, y: 2.2, w: 8.6, h: 0.5,
+      fontSize: 22, color: C.cyan, fontFace: "Calibri",
+      italic: true, margin: 0
+    });
+
+    // Separator line
+    s.addShape(pres.shapes.LINE, {
+      x: 0.7, y: 2.85, w: 8.6, h: 0,
+      line: { color: C.gray3, width: 1 }
+    });
+
+    // Tags row
+    const tags = ["Network Topology", "Subnetting", "Defense-in-Depth", "Traffic Flow", "Practical Labs"];
+    tags.forEach((t, i) => {
+      const xPos = 0.7 + i * 1.76;
+      s.addShape(pres.shapes.RECTANGLE, {
+        x: xPos, y: 3.0, w: 1.65, h: 0.32,
+        fill: { color: C.blue, transparency: 40 },
+        line: { color: C.cyan3, width: 0.5 }
+      });
+      s.addText(t, {
+        x: xPos, y: 3.0, w: 1.65, h: 0.32,
+        fontSize: 7.5, color: C.cyan, fontFace: "Consolas",
+        align: "center", valign: "middle", margin: 0
+      });
+    });
+
+    // Bottom footer
+    s.addText("BEGINNER  →  INTERMEDIATE  |  PRACTICAL LAB INCLUDED", {
+      x: 0.7, y: 3.6, w: 8.6, h: 0.25,
+      fontSize: 8, color: C.gray, fontFace: "Consolas",
+      charSpacing: 2, margin: 0
+    });
+
+    // Network icon
+    s.addImage({ data: iconNetwork, x: 8.2, y: 3.95, w: 0.7, h: 0.7 });
+
+    s.addText("\"Understanding the network is the first step to securing it.\"", {
+      x: 0.7, y: 4.1, w: 7.3, h: 0.4,
+      fontSize: 10, color: C.gray, fontFace: "Calibri",
+      italic: true, margin: 0
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 2 — WHAT IS A NETWORK?
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    // Top header bar
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: 0, y: 0, w: 10, h: 0.6,
+      fill: { color: C.panel }, line: { color: C.panel, width: 0 }
+    });
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: 0, y: 0.6, w: 10, h: 0.04,
+      fill: { color: C.cyan }, line: { color: C.cyan, width: 0 }
+    });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", {
+      x: 0.3, y: 0, w: 6, h: 0.6,
+      fontSize: 9, color: C.gray, fontFace: "Consolas",
+      valign: "middle", charSpacing: 2, margin: 0
+    });
+    s.addText("SLIDE 02 / 14", {
+      x: 7, y: 0, w: 2.7, h: 0.6,
+      fontSize: 9, color: C.cyan, fontFace: "Consolas",
+      align: "right", valign: "middle", charSpacing: 2, margin: 0
+    });
+
+    // Slide title
+    s.addImage({ data: iconNetwork, x: 0.3, y: 0.8, w: 0.45, h: 0.45 });
+    s.addText("What Is a Network?", {
+      x: 0.85, y: 0.8, w: 9, h: 0.45,
+      fontSize: 24, color: C.white, fontFace: "Arial Black",
+      bold: true, valign: "middle", margin: 0
+    });
+
+    // Definition card
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: 0.3, y: 1.45, w: 9.4, h: 0.7,
+      fill: { color: C.panel2 }, line: { color: C.cyan, width: 1 }
+    });
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: 0.3, y: 1.45, w: 0.06, h: 0.7,
+      fill: { color: C.cyan }, line: { color: C.cyan, width: 0 }
+    });
+    s.addText("A network enables two or more computers to communicate with each other by sharing data, resources, and services across a defined medium.", {
+      x: 0.5, y: 1.45, w: 9.1, h: 0.7,
+      fontSize: 12, color: C.white, fontFace: "Calibri",
+      valign: "middle", margin: 0
+    });
+
+    // 3 concept columns
+    const cols = [
+      { title: "TOPOLOGY", icon: "🔷", desc: "Physical/logical arrangement\nof nodes in a network\n\nMesh · Tree · Star · Bus" },
+      { title: "MEDIUM", icon: "🔷", desc: "The physical or wireless path\ndata travels through\n\nEthernet · Fiber · Wi-Fi · Coax" },
+      { title: "PROTOCOL", icon: "🔷", desc: "Rules governing how data\nis transmitted and received\n\nTCP · UDP · ICMP · ARP" }
+    ];
+    cols.forEach((col, i) => {
+      const xp = 0.3 + i * 3.2;
+      s.addShape(pres.shapes.RECTANGLE, {
+        x: xp, y: 2.3, w: 3.0, h: 1.9,
+        fill: { color: C.panel }, line: { color: C.cyan3, width: 1 }
+      });
+      s.addShape(pres.shapes.RECTANGLE, {
+        x: xp, y: 2.3, w: 3.0, h: 0.04,
+        fill: { color: C.cyan }, line: { color: C.cyan, width: 0 }
+      });
+      s.addText(col.title, {
+        x: xp, y: 2.38, w: 3.0, h: 0.3,
+        fontSize: 11, color: C.cyan, fontFace: "Consolas",
+        align: "center", bold: true, margin: 0
+      });
+      s.addText(col.desc, {
+        x: xp + 0.1, y: 2.75, w: 2.8, h: 1.35,
+        fontSize: 10, color: C.white, fontFace: "Calibri",
+        valign: "top", margin: 0
+      });
+    });
+
+    // Cybersecurity relevance callout
+    s.addShape(pres.shapes.RECTANGLE, {
+      x: 0.3, y: 4.35, w: 9.4, h: 0.9,
+      fill: { color: "0D2040" }, line: { color: C.blue2, width: 1 }
+    });
+    s.addImage({ data: iconShield, x: 0.45, y: 4.5, w: 0.35, h: 0.35 });
+    s.addText("WHY IT MATTERS IN CYBERSECURITY:", {
+      x: 0.9, y: 4.35, w: 8.5, h: 0.35,
+      fontSize: 9, color: C.blue2, fontFace: "Consolas",
+      bold: true, valign: "bottom", charSpacing: 1, margin: 0
+    });
+    s.addText("Network failures are often silent — misconfigured subnets can hide entire server segments. Attackers exploit flat networks with minimal lateral movement resistance.", {
+      x: 0.9, y: 4.68, w: 8.4, h: 0.5,
+      fontSize: 10, color: C.gray, fontFace: "Calibri",
+      valign: "top", margin: 0
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 3 — NETWORK TOPOLOGIES (visual diagram)
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    // Header
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.cyan }, line: { color: C.cyan, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 03 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.cyan, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addText("Network Topologies", {
+      x: 0.3, y: 0.75, w: 9.4, h: 0.5,
+      fontSize: 24, color: C.white, fontFace: "Arial Black", bold: true, margin: 0
+    });
+
+    // ── STAR TOPOLOGY (left) ──
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.2, y: 1.35, w: 2.9, h: 3.9, fill: { color: C.panel }, line: { color: C.cyan3, width: 1 } });
+    s.addText("STAR", { x: 0.2, y: 1.35, w: 2.9, h: 0.3, fontSize: 10, color: C.cyan, fontFace: "Consolas", align: "center", bold: true, margin: 0 });
+
+    // Central switch node
+    s.addShape(pres.shapes.OVAL, { x: 1.3, y: 2.35, w: 0.5, h: 0.5, fill: { color: C.cyan }, line: { color: C.cyan, width: 0 } });
+    s.addText("SW", { x: 1.3, y: 2.35, w: 0.5, h: 0.5, fontSize: 8, color: C.bg, fontFace: "Consolas", align: "center", valign: "middle", bold: true, margin: 0 });
+
+    // Star endpoints
+    const starPts = [[0.35, 1.8], [1.9, 1.8], [0.35, 3.1], [1.9, 3.1], [1.3, 4.4]];
+    starPts.forEach(([px, py]) => {
+      s.addShape(pres.shapes.OVAL, { x: px, y: py, w: 0.38, h: 0.38, fill: { color: C.panel2 }, line: { color: C.blue2, width: 1.5 } });
+      // Line to center
+      s.addShape(pres.shapes.LINE, {
+        x: px + 0.19, y: py + 0.19, w: 1.55 - px, h: 2.6 - py,
+        line: { color: C.cyan3, width: 1 }
+      });
+    });
+    s.addText("Central hub/switch\nconnects all devices\n\n✓ Easy to manage\n✓ Fault isolation\n✗ Single point of failure", {
+      x: 0.25, y: 4.85, w: 2.8, h: 0.6,
+      fontSize: 8.5, color: C.gray, fontFace: "Calibri", margin: 0
+    });
+
+    // ── MESH TOPOLOGY (center) ──
+    s.addShape(pres.shapes.RECTANGLE, { x: 3.35, y: 1.35, w: 3.2, h: 3.9, fill: { color: C.panel }, line: { color: C.cyan3, width: 1 } });
+    s.addText("MESH", { x: 3.35, y: 1.35, w: 3.2, h: 0.3, fontSize: 10, color: C.cyan, fontFace: "Consolas", align: "center", bold: true, margin: 0 });
+
+    // 4 mesh nodes
+    const meshNodes = [[3.6, 1.85], [6.1, 1.85], [3.6, 3.5], [6.1, 3.5]];
+    meshNodes.forEach(([px, py]) => {
+      s.addShape(pres.shapes.OVAL, { x: px, y: py, w: 0.42, h: 0.42, fill: { color: C.panel2 }, line: { color: C.green, width: 1.5 } });
+    });
+    // Mesh connections
+    const meshConnections = [[0,1],[0,2],[0,3],[1,2],[1,3],[2,3]];
+    meshConnections.forEach(([a, b]) => {
+      const [ax, ay] = meshNodes[a], [bx, by] = meshNodes[b];
+      s.addShape(pres.shapes.LINE, {
+        x: ax + 0.21, y: ay + 0.21, w: bx - ax, h: by - ay,
+        line: { color: C.green, width: 1, transparency: 40 }
+      });
+    });
+    s.addText("Every node connects\nto every other node\n\n✓ Highly redundant\n✓ No single failure point\n✗ Expensive/complex", {
+      x: 3.4, y: 4.85, w: 3.1, h: 0.6,
+      fontSize: 8.5, color: C.gray, fontFace: "Calibri", margin: 0
+    });
+
+    // ── TREE TOPOLOGY (right) ──
+    s.addShape(pres.shapes.RECTANGLE, { x: 6.8, y: 1.35, w: 3.0, h: 3.9, fill: { color: C.panel }, line: { color: C.cyan3, width: 1 } });
+    s.addText("TREE", { x: 6.8, y: 1.35, w: 3.0, h: 0.3, fontSize: 10, color: C.cyan, fontFace: "Consolas", align: "center", bold: true, margin: 0 });
+
+    // Root
+    s.addShape(pres.shapes.OVAL, { x: 8.1, y: 1.8, w: 0.45, h: 0.45, fill: { color: C.orange }, line: { color: C.orange, width: 0 } });
+    // Level 2
+    const treeL2 = [[7.35, 2.7], [8.85, 2.7]];
+    treeL2.forEach(([px, py]) => {
+      s.addShape(pres.shapes.OVAL, { x: px, y: py, w: 0.4, h: 0.4, fill: { color: C.panel2 }, line: { color: C.orange, width: 1.5 } });
+      s.addShape(pres.shapes.LINE, { x: px + 0.2, y: py, w: 8.33 - px, h: -0.55, line: { color: C.orange, width: 1 } });
+    });
+    // Level 3
+    const treeL3 = [[7.0, 3.65], [7.65, 3.65], [8.5, 3.65], [9.15, 3.65]];
+    treeL3.forEach(([px, py], i) => {
+      s.addShape(pres.shapes.OVAL, { x: px, y: py, w: 0.35, h: 0.35, fill: { color: C.panel2 }, line: { color: C.gray3, width: 1 } });
+      const parentX = i < 2 ? treeL2[0][0] + 0.2 : treeL2[1][0] + 0.2;
+      const parentY = treeL2[i < 2 ? 0 : 1][1] + 0.4;
+      s.addShape(pres.shapes.LINE, { x: px + 0.175, y: py, w: parentX - px - 0.175, h: parentY - py, line: { color: C.gray3, width: 1 } });
+    });
+    s.addText("Hierarchical structure\nlike enterprise LANs\n\n✓ Scalable design\n✓ Segment isolation\n✗ Root failure = outage", {
+      x: 6.85, y: 4.85, w: 2.9, h: 0.6,
+      fontSize: 8.5, color: C.gray, fontFace: "Calibri", margin: 0
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 4 — FLAT vs SEGMENTED NETWORK
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.red }, line: { color: C.red, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 04 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.red, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addText("Flat Network vs. Segmented Network", {
+      x: 0.3, y: 0.75, w: 9.4, h: 0.5,
+      fontSize: 22, color: C.white, fontFace: "Arial Black", bold: true, margin: 0
+    });
+
+    // ── FLAT NETWORK (left panel) ──
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.2, y: 1.4, w: 4.5, h: 3.85, fill: { color: C.panel }, line: { color: C.red, width: 1.5 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.2, y: 1.4, w: 4.5, h: 0.32, fill: { color: "3B0A0A" }, line: { color: C.red, width: 0 } });
+    s.addText("FLAT NETWORK  — /24 Subnet", { x: 0.3, y: 1.4, w: 4.3, h: 0.32, fontSize: 10, color: C.red, fontFace: "Consolas", valign: "middle", bold: true, margin: 0 });
+
+    // Flat network: single bus
+    s.addShape(pres.shapes.LINE, { x: 0.5, y: 2.85, w: 3.9, h: 0, line: { color: C.gray2, width: 3 } });
+    const flatDevices = [
+      { x: 0.55, label: "PC\n.100", color: C.blue2 },
+      { x: 1.25, label: "Printer\n.110", color: C.orange },
+      { x: 2.0, label: "Server\n.50", color: C.green },
+      { x: 2.8, label: "DB\n.60", color: C.purple },
+      { x: 3.55, label: "IP Phone\n.130", color: C.cyan },
+    ];
+    flatDevices.forEach(d => {
+      s.addShape(pres.shapes.RECTANGLE, { x: d.x, y: 2.15, w: 0.6, h: 0.55, fill: { color: d.color, transparency: 30 }, line: { color: d.color, width: 1 } });
+      s.addText(d.label, { x: d.x, y: 2.15, w: 0.6, h: 0.55, fontSize: 6.5, color: C.white, fontFace: "Consolas", align: "center", valign: "middle", margin: 0 });
+      s.addShape(pres.shapes.LINE, { x: d.x + 0.3, y: 2.7, w: 0, h: 0.15, line: { color: C.gray2, width: 1.5 } });
+    });
+
+    // Attack arrow on flat
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 3.2, w: 4.1, h: 0.9, fill: { color: "2A0808" }, line: { color: C.red, width: 1, dashType: "dash" } });
+    s.addImage({ data: iconWarn, x: 0.4, y: 3.3, w: 0.3, h: 0.3 });
+    s.addText("ATTACK RISK: Printer compromised → directly reaches DB server\nNo ACLs, no segmentation, lateral movement is trivial!", {
+      x: 0.8, y: 3.2, w: 3.5, h: 0.9, fontSize: 8.5, color: C.red, fontFace: "Calibri", valign: "middle", margin: 0
+    });
+    s.addText("192.168.1.0/24  —  ALL devices in same broadcast domain", {
+      x: 0.3, y: 4.15, w: 4.3, h: 0.35, fontSize: 8, color: C.gray, fontFace: "Consolas", margin: 0
+    });
+    s.addText("Printers can reach Domain Controllers!\nPort scans go unchallenged across all hosts.", {
+      x: 0.3, y: 4.55, w: 4.3, h: 0.6, fontSize: 9, color: C.orange, fontFace: "Calibri", margin: 0
+    });
+
+    // ── SEGMENTED NETWORK (right panel) ──
+    s.addShape(pres.shapes.RECTANGLE, { x: 5.1, y: 1.4, w: 4.7, h: 3.85, fill: { color: C.panel }, line: { color: C.green, width: 1.5 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 5.1, y: 1.4, w: 4.7, h: 0.32, fill: { color: "0A2A0A" }, line: { color: C.green, width: 0 } });
+    s.addText("SEGMENTED NETWORK  — VLANs + ACLs", { x: 5.2, y: 1.4, w: 4.5, h: 0.32, fontSize: 10, color: C.green, fontFace: "Consolas", valign: "middle", bold: true, margin: 0 });
+
+    // Segments
+    const segs = [
+      { y: 1.85, label: "DMZ  192.168.10.0/28", color: C.orange, dev: "Web Server" },
+      { y: 2.55, label: "WORKSTATIONS  192.168.20.0/24", color: C.blue2, dev: "PC / Laptop" },
+      { y: 3.25, label: "SERVERS  192.168.30.0/25", color: C.purple, dev: "DB / App" },
+      { y: 3.95, label: "PRINTERS  192.168.40.0/28", color: C.gray2, dev: "Printer" },
+    ];
+    segs.forEach(seg => {
+      s.addShape(pres.shapes.RECTANGLE, { x: 5.2, y: seg.y, w: 4.5, h: 0.55, fill: { color: seg.color, transparency: 80 }, line: { color: seg.color, width: 1 } });
+      s.addText(seg.label, { x: 5.35, y: seg.y + 0.02, w: 3.2, h: 0.28, fontSize: 8, color: seg.color, fontFace: "Consolas", bold: true, margin: 0 });
+      s.addText(seg.dev, { x: 5.35, y: seg.y + 0.28, w: 2.5, h: 0.22, fontSize: 8, color: C.white, fontFace: "Calibri", margin: 0 });
+      // Firewall icon text
+      s.addShape(pres.shapes.RECTANGLE, { x: 9.05, y: seg.y + 0.08, w: 0.55, h: 0.35, fill: { color: C.orange, transparency: 60 }, line: { color: C.orange, width: 0.5 } });
+      s.addText("FW", { x: 9.05, y: seg.y + 0.08, w: 0.55, h: 0.35, fontSize: 8, color: C.orange, fontFace: "Consolas", align: "center", valign: "middle", bold: true, margin: 0 });
+    });
+    s.addText("[FIREWALL / ACL]", { x: 9.0, y: 1.4, w: 0.75, h: 0.35, fontSize: 6, color: C.orange, fontFace: "Consolas", align: "center", margin: 0 });
+    s.addText("Printer compromised? → Cannot reach DB.\nACL blocks cross-segment traffic!", {
+      x: 5.2, y: 4.6, w: 4.3, h: 0.55, fontSize: 9, color: C.green, fontFace: "Calibri", margin: 0
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 5 — HOW THE INTERNET WORKS (Packet Journey)
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.cyan }, line: { color: C.cyan, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 05 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.cyan, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addText("How the Internet Works: Packet Journey", {
+      x: 0.3, y: 0.75, w: 9.4, h: 0.5,
+      fontSize: 22, color: C.white, fontFace: "Arial Black", bold: true, margin: 0
+    });
+
+    // Journey steps
+    const steps = [
+      { num: "01", title: "Browser Request", desc: "User types hackthebox.eu\nURL resolved to FQDN", icon: "💻", color: C.blue2 },
+      { num: "02", title: "Home Router", desc: "Your gateway routes\npacket to ISP", icon: "🏠", color: C.cyan },
+      { num: "03", title: "DNS Lookup", desc: "ISP queries DNS server\nFQDN → IP Address", icon: "📖", color: C.teal },
+      { num: "04", title: "ISP Backbone", desc: "Packet traverses the\ninternet backbone", icon: "🌐", color: C.purple },
+      { num: "05", title: "Web Server", desc: "Target server receives\nHTTP/HTTPS request", icon: "🖥️", color: C.green },
+    ];
+
+    steps.forEach((st, i) => {
+      const xp = 0.25 + i * 1.92;
+      // Box
+      s.addShape(pres.shapes.RECTANGLE, {
+        x: xp, y: 1.4, w: 1.7, h: 2.4,
+        fill: { color: C.panel }, line: { color: st.color, width: 1 }
+      });
+      s.addShape(pres.shapes.RECTANGLE, {
+        x: xp, y: 1.4, w: 1.7, h: 0.04,
+        fill: { color: st.color }, line: { color: st.color, width: 0 }
+      });
+      // Step number badge
+      s.addShape(pres.shapes.OVAL, {
+        x: xp + 0.62, y: 1.55, w: 0.45, h: 0.45,
+        fill: { color: st.color, transparency: 20 }, line: { color: st.color, width: 1 }
+      });
+      s.addText(st.num, { x: xp + 0.62, y: 1.55, w: 0.45, h: 0.45, fontSize: 11, color: C.white, fontFace: "Arial Black", align: "center", valign: "middle", bold: true, margin: 0 });
+      s.addText(st.title, { x: xp + 0.05, y: 2.1, w: 1.6, h: 0.35, fontSize: 10, color: st.color, fontFace: "Consolas", align: "center", bold: true, margin: 0 });
+      s.addText(st.desc, { x: xp + 0.05, y: 2.5, w: 1.6, h: 0.8, fontSize: 9, color: C.white, fontFace: "Calibri", align: "center", margin: 0 });
+
+      // Arrow between steps
+      if (i < 4) {
+        s.addShape(pres.shapes.LINE, {
+          x: xp + 1.72, y: 2.6, w: 0.18, h: 0,
+          line: { color: C.cyan3, width: 2 }
+        });
+        s.addText("→", { x: xp + 1.72, y: 2.5, w: 0.2, h: 0.25, fontSize: 12, color: C.cyan, fontFace: "Arial", align: "center", margin: 0 });
+      }
+    });
+
+    // FQDN vs URL explanation
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 4.0, w: 4.5, h: 1.3, fill: { color: C.panel2 }, line: { color: C.cyan3, width: 1 } });
+    s.addText("FQDN vs URL", { x: 0.4, y: 4.0, w: 4.3, h: 0.3, fontSize: 10, color: C.cyan, fontFace: "Consolas", bold: true, margin: 0 });
+    s.addText([
+      { text: "FQDN: ", options: { bold: true, color: C.cyan } },
+      { text: "www.hackthebox.eu  → just the address\n", options: { color: C.white } },
+      { text: "URL:  ", options: { bold: true, color: C.teal } },
+      { text: "https://hackthebox.eu/path?param=val  → full location", options: { color: C.white } }
+    ], { x: 0.4, y: 4.3, w: 4.3, h: 0.95, fontSize: 10, fontFace: "Consolas", margin: 0 });
+
+    // DNS packet flow
+    s.addShape(pres.shapes.RECTANGLE, { x: 5.1, y: 4.0, w: 4.7, h: 1.3, fill: { color: C.panel2 }, line: { color: C.teal, width: 1 } });
+    s.addImage({ data: iconDns, x: 5.2, y: 4.05, w: 0.35, h: 0.35 });
+    s.addText("DNS Resolution Flow", { x: 5.65, y: 4.0, w: 4.0, h: 0.35, fontSize: 10, color: C.teal, fontFace: "Consolas", bold: true, valign: "middle", margin: 0 });
+    s.addText("Browser → Recursive Resolver → Root NS → TLD NS → Auth NS → IP\nResult cached locally (TTL). Command: dig hackthebox.eu A", {
+      x: 5.2, y: 4.38, w: 4.5, h: 0.85, fontSize: 9.5, color: C.white, fontFace: "Calibri", margin: 0
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 6 — SUBNETTING DEEP DIVE
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.cyan }, line: { color: C.cyan, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 06 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.cyan, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addText("Subnetting: /24 vs /25 — The Pentester's Pitfall", {
+      x: 0.3, y: 0.75, w: 9.4, h: 0.5,
+      fontSize: 20, color: C.white, fontFace: "Arial Black", bold: true, margin: 0
+    });
+
+    // Real case callout
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 1.35, w: 9.4, h: 0.75, fill: { color: "1A1000" }, line: { color: C.orange, width: 1.5 } });
+    s.addImage({ data: iconWarn, x: 0.45, y: 1.45, w: 0.4, h: 0.4 });
+    s.addText("REAL PENTEST SCENARIO:", { x: 0.95, y: 1.35, w: 5, h: 0.3, fontSize: 9, color: C.orange, fontFace: "Consolas", bold: true, valign: "bottom", margin: 0 });
+    s.addText("A pentester reported the Domain Controller as \"offline\" — it was actually on a /25 subnet they couldn't reach because they misconfigured their subnet mask as /24!", {
+      x: 0.95, y: 1.62, w: 8.6, h: 0.45, fontSize: 9.5, color: C.white, fontFace: "Calibri", valign: "top", margin: 0
+    });
+
+    // Subnet table
+    s.addText("Network Layout That Caused the Confusion:", { x: 0.3, y: 2.25, w: 9.4, h: 0.28, fontSize: 11, color: C.cyan, fontFace: "Consolas", bold: true, margin: 0 });
+
+    const tableData = [
+      [
+        { text: "DEVICE", options: { bold: true, color: C.white, fill: { color: C.blue } } },
+        { text: "IP ADDRESS", options: { bold: true, color: C.white, fill: { color: C.blue } } },
+        { text: "SUBNET", options: { bold: true, color: C.white, fill: { color: C.blue } } },
+        { text: "NETWORK HALF", options: { bold: true, color: C.white, fill: { color: C.blue } } },
+        { text: "REACHABLE?", options: { bold: true, color: C.white, fill: { color: C.blue } } }
+      ],
+      [
+        { text: "Server Gateway", options: { color: C.white, fill: { color: C.panel2 } } },
+        { text: "10.20.0.1", options: { color: C.cyan, fontFace: "Consolas", fill: { color: C.panel2 } } },
+        { text: "/25", options: { color: C.green, fill: { color: C.panel2 } } },
+        { text: "10.20.0.0–127  (first half)", options: { color: C.gray, fontFace: "Consolas", fill: { color: C.panel2 } } },
+        { text: "YES (gateway)", options: { color: C.green, fill: { color: C.panel2 } } }
+      ],
+      [
+        { text: "Domain Controller", options: { color: C.white, fill: { color: C.panel } } },
+        { text: "10.20.0.10", options: { color: C.cyan, fontFace: "Consolas", fill: { color: C.panel } } },
+        { text: "/25", options: { color: C.green, fill: { color: C.panel } } },
+        { text: "10.20.0.0–127  (first half)", options: { color: C.gray, fontFace: "Consolas", fill: { color: C.panel } } },
+        { text: "INVISIBLE TO PENTEST", options: { color: C.red, bold: true, fill: { color: C.panel } } }
+      ],
+      [
+        { text: "Client Gateway", options: { color: C.white, fill: { color: C.panel2 } } },
+        { text: "10.20.0.129", options: { color: C.cyan, fontFace: "Consolas", fill: { color: C.panel2 } } },
+        { text: "/25", options: { color: C.orange, fill: { color: C.panel2 } } },
+        { text: "10.20.0.128–255  (second half)", options: { color: C.gray, fontFace: "Consolas", fill: { color: C.panel2 } } },
+        { text: "YES (gateway)", options: { color: C.green, fill: { color: C.panel2 } } }
+      ],
+      [
+        { text: "Client PC", options: { color: C.white, fill: { color: C.panel } } },
+        { text: "10.20.0.200", options: { color: C.cyan, fontFace: "Consolas", fill: { color: C.panel } } },
+        { text: "/25", options: { color: C.orange, fill: { color: C.panel } } },
+        { text: "10.20.0.128–255  (second half)", options: { color: C.gray, fontFace: "Consolas", fill: { color: C.panel } } },
+        { text: "YES", options: { color: C.green, fill: { color: C.panel } } }
+      ],
+      [
+        { text: "PENTESTER (WRONG!)", options: { bold: true, color: C.red, fill: { color: "200A0A" } } },
+        { text: "10.20.0.252", options: { color: C.red, fontFace: "Consolas", fill: { color: "200A0A" } } },
+        { text: "/24 ← WRONG", options: { bold: true, color: C.red, fill: { color: "200A0A" } } },
+        { text: "Assumed full /24 range", options: { color: C.orange, fill: { color: "200A0A" } } },
+        { text: "MISSED DC!", options: { bold: true, color: C.red, fill: { color: "200A0A" } } }
+      ]
+    ];
+    s.addTable(tableData, {
+      x: 0.3, y: 2.58, w: 9.4, h: 2.2,
+      rowH: 0.34,
+      border: { pt: 1, color: C.gray3 },
+      fontFace: "Calibri", fontSize: 9
+    });
+
+    // Lesson
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 4.9, w: 9.4, h: 0.45, fill: { color: "0A1A0A" }, line: { color: C.green, width: 1 } });
+    s.addText("KEY LESSON: Always verify subnet masks before scanning. Use 'ip a' and 'ip route' to confirm your network range.", {
+      x: 0.45, y: 4.9, w: 9.1, h: 0.45, fontSize: 10, color: C.green, fontFace: "Consolas", valign: "middle", margin: 0
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 7 — NETWORK SEGMENTATION & DEFENSE IN DEPTH
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.cyan }, line: { color: C.cyan, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 07 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.cyan, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addText("Defense-in-Depth: Network Segmentation", {
+      x: 0.3, y: 0.75, w: 9.4, h: 0.5,
+      fontSize: 22, color: C.white, fontFace: "Arial Black", bold: true, margin: 0
+    });
+
+    // 5 segments as layered zones
+    const zones = [
+      { label: "INTERNET", color: C.red,    subnet: "Public",              note: "Untrusted. All traffic filtered at perimeter firewall." },
+      { label: "DMZ",      color: C.orange, subnet: "192.168.10.0/28",     note: "Web/mail servers. Internet can initiate connections here." },
+      { label: "WORKSTATIONS", color: C.blue2, subnet: "192.168.20.0/24", note: "Isolated per workstation via host firewall rules." },
+      { label: "SERVERS",  color: C.purple, subnet: "192.168.30.0/25",     note: "DB & App servers. No direct workstation access." },
+      { label: "MGMT NET", color: C.teal,   subnet: "192.168.99.0/28",     note: "Router/Switch administration. Only admin staff access." },
+    ];
+    zones.forEach((z, i) => {
+      const yp = 1.4 + i * 0.78;
+      const width = 9.4 - i * 0.3;
+      const xp = 0.3 + i * 0.15;
+      s.addShape(pres.shapes.RECTANGLE, {
+        x: xp, y: yp, w: width, h: 0.7,
+        fill: { color: z.color, transparency: 75 },
+        line: { color: z.color, width: 1.5 }
+      });
+      s.addShape(pres.shapes.RECTANGLE, {
+        x: xp, y: yp, w: 1.5, h: 0.7,
+        fill: { color: z.color, transparency: 50 },
+        line: { color: z.color, width: 0 }
+      });
+      s.addText(z.label, { x: xp + 0.05, y: yp, w: 1.4, h: 0.7, fontSize: 9, color: C.white, fontFace: "Consolas", align: "center", valign: "middle", bold: true, margin: 0 });
+      s.addText(z.subnet, { x: xp + 1.6, y: yp, w: 1.6, h: 0.35, fontSize: 8, color: z.color, fontFace: "Consolas", valign: "bottom", margin: 0 });
+      s.addText(z.note, { x: xp + 1.6, y: yp + 0.33, w: width - 1.75, h: 0.35, fontSize: 8.5, color: C.white, fontFace: "Calibri", valign: "top", margin: 0 });
+
+      // Firewall between zones
+      if (i < 4) {
+        s.addShape(pres.shapes.RECTANGLE, { x: 9.35, y: yp + 0.62, w: 0.55, h: 0.25, fill: { color: C.orange, transparency: 30 }, line: { color: C.orange, width: 0.5 } });
+        s.addText("ACL", { x: 9.35, y: yp + 0.62, w: 0.55, h: 0.25, fontSize: 7, color: C.orange, fontFace: "Consolas", align: "center", valign: "middle", bold: true, margin: 0 });
+      }
+    });
+
+    s.addText("Each layer requires separate authentication. Compromise of one zone does not grant access to others.", {
+      x: 0.3, y: 5.28, w: 9.4, h: 0.3, fontSize: 9, color: C.gray, fontFace: "Calibri", italic: true, margin: 0
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 8 — ENTERPRISE NETWORK COMPONENTS
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.cyan }, line: { color: C.cyan, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 08 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.cyan, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addText("Enterprise Network Components", {
+      x: 0.3, y: 0.75, w: 9.4, h: 0.5,
+      fontSize: 22, color: C.white, fontFace: "Arial Black", bold: true, margin: 0
+    });
+
+    const components = [
+      { icon: iconRouter, title: "Router", subnet: "Admin Net 192.168.99.0/28", desc: "Routes traffic between networks. Must be on isolated Admin VLAN to prevent OSPF hijacking and routing attacks.", threat: "OSPF spoofing, route injection", color: C.cyan },
+      { icon: iconServer, title: "Switch (L2/L3)", subnet: "Admin Net 192.168.99.0/28", desc: "Connects devices within a segment. Managed switches support VLANs. Separate from user networks.", threat: "ARP spoofing, MAC flooding, VLAN hopping", color: C.blue2 },
+      { icon: iconFire, title: "Firewall", subnet: "Perimeter / Segment ACLs", desc: "Filters traffic between zones. Applies ACLs. Stateful inspection tracks connection state.", threat: "Misconfiguration, rule bypass", color: C.orange },
+      { icon: iconShield, title: "IDS/IPS (Suricata / Snort)", subnet: "Monitoring all segments", desc: "Intrusion Detection/Prevention systems. Suricata and Snort detect port scans, exploits, and anomalies in real-time.", threat: "Evasion via fragmentation, slow scans", color: C.green },
+    ];
+
+    components.forEach((c, i) => {
+      const xp = 0.25 + (i % 2) * 4.9;
+      const yp = 1.4 + Math.floor(i / 2) * 2.1;
+      s.addShape(pres.shapes.RECTANGLE, { x: xp, y: yp, w: 4.6, h: 1.9, fill: { color: C.panel }, line: { color: c.color, width: 1 } });
+      s.addShape(pres.shapes.RECTANGLE, { x: xp, y: yp, w: 4.6, h: 0.04, fill: { color: c.color }, line: { color: c.color, width: 0 } });
+      s.addImage({ data: c.icon, x: xp + 0.12, y: yp + 0.1, w: 0.4, h: 0.4 });
+      s.addText(c.title, { x: xp + 0.6, y: yp + 0.08, w: 3.9, h: 0.3, fontSize: 12, color: c.color, fontFace: "Consolas", bold: true, margin: 0 });
+      s.addText(c.subnet, { x: xp + 0.6, y: yp + 0.38, w: 3.9, h: 0.22, fontSize: 8, color: C.gray, fontFace: "Consolas", margin: 0 });
+      s.addShape(pres.shapes.LINE, { x: xp + 0.12, y: yp + 0.65, w: 4.35, h: 0, line: { color: C.gray3, width: 0.5 } });
+      s.addText(c.desc, { x: xp + 0.12, y: yp + 0.72, w: 4.35, h: 0.7, fontSize: 9, color: C.white, fontFace: "Calibri", margin: 0 });
+      s.addShape(pres.shapes.RECTANGLE, { x: xp + 0.12, y: yp + 1.52, w: 4.35, h: 0.28, fill: { color: "1A0808" }, line: { color: C.red, width: 0.5 } });
+      s.addImage({ data: iconWarn, x: xp + 0.14, y: yp + 1.56, w: 0.2, h: 0.2 });
+      s.addText("ATTACK VECTOR: " + c.threat, { x: xp + 0.38, y: yp + 1.52, w: 4.0, h: 0.28, fontSize: 8, color: C.red, fontFace: "Consolas", valign: "middle", margin: 0 });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 9 — PRINTERS & THE FORGOTTEN ATTACK SURFACE
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.red }, line: { color: C.red, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 09 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.red, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addImage({ data: iconWarn, x: 0.3, y: 0.77, w: 0.45, h: 0.45 });
+    s.addText("Printers: The Forgotten Attack Surface", {
+      x: 0.85, y: 0.75, w: 9, h: 0.5,
+      fontSize: 22, color: C.white, fontFace: "Arial Black", bold: true, valign: "middle", margin: 0
+    });
+
+    // Story callout
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 1.4, w: 9.4, h: 1.5, fill: { color: "1A0808" }, line: { color: C.red, width: 1.5 } });
+    s.addText("REAL-WORLD RED TEAM OPERATION", { x: 0.45, y: 1.42, w: 7, h: 0.3, fontSize: 9, color: C.red, fontFace: "Consolas", bold: true, charSpacing: 2, margin: 0 });
+    s.addText("During COVID-19, a pentester purchased a physical printer and embedded a reverse shell into its firmware. They shipped it to the target company with a phishing email thanking staff. The printer was connected immediately — and the Domain Administrator's workstation sent NTLMv2 credentials to the printer automatically during a print authentication handshake.\n\nResult: Full domain compromise via a \"free\" printer.", {
+      x: 0.45, y: 1.75, w: 9.1, h: 1.1, fontSize: 10, color: C.white, fontFace: "Calibri", margin: 0
+    });
+
+    // Attack chain
+    s.addText("ATTACK CHAIN:", { x: 0.3, y: 3.05, w: 3, h: 0.28, fontSize: 9, color: C.orange, fontFace: "Consolas", bold: true, margin: 0 });
+    const chain = ["Malicious\nPrinter Ships", "Connects to\nFlat Network", "PC Sends\nNTLMv2 Auth", "Credentials\nCaptured", "Domain\nCompromised"];
+    chain.forEach((step, i) => {
+      const xp = 0.3 + i * 1.88;
+      s.addShape(pres.shapes.RECTANGLE, { x: xp, y: 3.35, w: 1.65, h: 0.65, fill: { color: C.panel2 }, line: { color: C.red, width: 1 } });
+      s.addText(step, { x: xp, y: 3.35, w: 1.65, h: 0.65, fontSize: 8.5, color: C.white, fontFace: "Calibri", align: "center", valign: "middle", margin: 0 });
+      if (i < 4) s.addText("→", { x: xp + 1.67, y: 3.5, w: 0.2, h: 0.35, fontSize: 12, color: C.red, fontFace: "Arial", align: "center", margin: 0 });
+    });
+
+    // Prevention controls
+    s.addText("PREVENTION (If segmented properly):", { x: 0.3, y: 4.15, w: 5, h: 0.28, fontSize: 9, color: C.green, fontFace: "Consolas", bold: true, margin: 0 });
+    const prevents = [
+      "Printer VLAN blocked from internet egress",
+      "Workstation→Printer communication blocked on port 445",
+      "Printer cannot initiate TCP connections to workstations",
+      "NTLMv2 relay mitigated by SMB signing enforcement"
+    ];
+    prevents.forEach((p, i) => {
+      s.addText([
+        { text: "✓  ", options: { color: C.green, bold: true } },
+        { text: p, options: { color: C.white } }
+      ], { x: 0.4, y: 4.48 + i * 0.28, w: 9.2, h: 0.26, fontSize: 10, fontFace: "Calibri", margin: 0 });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 10 — IDS/IPS — SURICATA & SNORT
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.green }, line: { color: C.green, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 10 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.green, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addImage({ data: iconEye, x: 0.3, y: 0.77, w: 0.45, h: 0.45 });
+    s.addText("IDS / IPS: Suricata & Snort", {
+      x: 0.85, y: 0.75, w: 9, h: 0.5,
+      fontSize: 22, color: C.white, fontFace: "Arial Black", bold: true, valign: "middle", margin: 0
+    });
+
+    // IDS vs IPS comparison
+    const cols = [
+      { title: "IDS — Intrusion Detection", color: C.cyan, items: ["Monitors & alerts only", "Passive — no traffic block", "Out-of-band/mirror port", "Alert on: port scans, exploits", "Tools: Suricata, Snort (IDS mode)", "Best for: forensics & alerting"] },
+      { title: "IPS — Intrusion Prevention", color: C.green, items: ["Monitors AND blocks", "Inline — traffic passes through it", "Active packet drop capability", "Blocks: exploits, C2 traffic", "Tools: Suricata, Snort (IPS mode)", "Best for: active defense"] },
+    ];
+    cols.forEach((col, i) => {
+      const xp = 0.3 + i * 4.9;
+      s.addShape(pres.shapes.RECTANGLE, { x: xp, y: 1.4, w: 4.6, h: 2.75, fill: { color: C.panel }, line: { color: col.color, width: 1.5 } });
+      s.addShape(pres.shapes.RECTANGLE, { x: xp, y: 1.4, w: 4.6, h: 0.35, fill: { color: col.color, transparency: 70 }, line: { color: col.color, width: 0 } });
+      s.addText(col.title, { x: xp + 0.1, y: 1.4, w: 4.4, h: 0.35, fontSize: 11, color: col.color, fontFace: "Consolas", bold: true, valign: "middle", margin: 0 });
+      col.items.forEach((item, j) => {
+        s.addText([
+          { text: "▸  ", options: { color: col.color } },
+          { text: item, options: { color: C.white } }
+        ], { x: xp + 0.1, y: 1.82 + j * 0.37, w: 4.4, h: 0.35, fontSize: 10, fontFace: "Calibri", margin: 0 });
+      });
+    });
+
+    // Example scenario
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 4.28, w: 9.4, h: 0.5, fill: { color: "0A1A0A" }, line: { color: C.green, width: 1 } });
+    s.addText("DETECTION EXAMPLE — Why printer network generating Nmap scans is suspicious:", { x: 0.45, y: 4.28, w: 9.1, h: 0.25, fontSize: 9, color: C.green, fontFace: "Consolas", bold: true, margin: 0 });
+    s.addText("Suricata rule fires: ET SCAN Nmap Scripting Engine User-Agent → Source: 192.168.40.5 (PRINTER VLAN) → Alert triggered, traffic optionally blocked", { x: 0.45, y: 4.5, w: 9.1, h: 0.25, fontSize: 9, color: C.white, fontFace: "Consolas", margin: 0 });
+
+    // Traffic flow diagram
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 4.85, w: 9.4, h: 0.45, fill: { color: C.panel2 }, line: { color: C.cyan3, width: 1 } });
+    s.addText("TRAFFIC FLOW:  [INTERNET] → [FIREWALL] → [IPS INLINE] → [DMZ ROUTER] → [WEB SERVER]  |  Suspicious traffic DROPPED at IPS", {
+      x: 0.4, y: 4.85, w: 9.2, h: 0.45, fontSize: 9, color: C.white, fontFace: "Consolas", valign: "middle", margin: 0
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 11 — PRACTICAL LAB: LINUX NETWORK COMMANDS
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.green }, line: { color: C.green, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 11 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.green, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addImage({ data: iconTerm, x: 0.3, y: 0.77, w: 0.45, h: 0.45 });
+    s.addText("Practical Lab: Linux Network Commands", {
+      x: 0.85, y: 0.75, w: 9, h: 0.5,
+      fontSize: 20, color: C.white, fontFace: "Arial Black", bold: true, valign: "middle", margin: 0
+    });
+
+    // Terminal blocks
+    const commands = [
+      {
+        title: "1. View Network Interfaces & IP Info",
+        cmd: "$ ip a\n$ ip addr show eth0\n$ ifconfig  (legacy)",
+        output: "2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP>\n    inet 10.20.0.200/25  brd 10.20.0.255\n    ← SUBNET MASK tells you your network half!",
+        color: C.green
+      },
+      {
+        title: "2. Check Routing Table",
+        cmd: "$ ip route\n$ ip route show\n$ route -n  (legacy)",
+        output: "default via 10.20.0.129 dev eth0\n10.20.0.128/25 dev eth0 proto kernel\n    ← Confirms you're on the .128 half, not .0 half!",
+        color: C.cyan
+      },
+      {
+        title: "3. DNS Lookup — dig",
+        cmd: "$ dig hackthebox.eu A\n$ dig hackthebox.eu MX\n$ nslookup hackthebox.eu",
+        output: ";; ANSWER SECTION:\nhackthebox.eu.  300  IN  A  104.26.10.50\n    ← IP address of the target domain",
+        color: C.teal
+      },
+      {
+        title: "4. Network Scanning — Nmap",
+        cmd: "$ nmap -sV 192.168.1.0/24\n$ nmap -p 80,443,22 10.20.0.0/25\n$ nmap -sn 192.168.1.0/24  (host discovery)",
+        output: "PORT   STATE  SERVICE  VERSION\n22/tcp open   ssh      OpenSSH 8.4\n80/tcp open   http     Apache 2.4.51",
+        color: C.orange
+      },
+    ];
+
+    commands.forEach((cmd, i) => {
+      const xp = 0.2 + (i % 2) * 5.0;
+      const yp = 1.4 + Math.floor(i / 2) * 2.05;
+      // Title
+      s.addText(cmd.title, { x: xp, y: yp, w: 4.7, h: 0.28, fontSize: 9, color: cmd.color, fontFace: "Consolas", bold: true, margin: 0 });
+      // Command terminal block
+      s.addShape(pres.shapes.RECTANGLE, { x: xp, y: yp + 0.3, w: 4.7, h: 0.75, fill: { color: "050D1A" }, line: { color: cmd.color, width: 1 } });
+      s.addShape(pres.shapes.RECTANGLE, { x: xp, y: yp + 0.3, w: 4.7, h: 0.18, fill: { color: cmd.color, transparency: 80 }, line: { color: cmd.color, width: 0 } });
+      s.addText("KALI LINUX TERMINAL", { x: xp + 0.05, y: yp + 0.3, w: 4.6, h: 0.18, fontSize: 7, color: cmd.color, fontFace: "Consolas", valign: "middle", margin: 0 });
+      s.addText(cmd.cmd, { x: xp + 0.08, y: yp + 0.48, w: 4.55, h: 0.6, fontSize: 8.5, color: C.green, fontFace: "Consolas", valign: "top", margin: 0 });
+      // Output block
+      s.addShape(pres.shapes.RECTANGLE, { x: xp, y: yp + 1.08, w: 4.7, h: 0.75, fill: { color: "0A1008" }, line: { color: C.gray3, width: 0.5 } });
+      s.addText(cmd.output, { x: xp + 0.08, y: yp + 1.08, w: 4.55, h: 0.75, fontSize: 8, color: C.gray, fontFace: "Consolas", valign: "middle", margin: 0 });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 12 — ACL & FIREWALL RULES
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.orange }, line: { color: C.orange, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 12 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.orange, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addImage({ data: iconFire, x: 0.3, y: 0.77, w: 0.45, h: 0.45 });
+    s.addText("ACL & Firewall Rules: Controlling Traffic", {
+      x: 0.85, y: 0.75, w: 9, h: 0.5,
+      fontSize: 20, color: C.white, fontFace: "Arial Black", bold: true, valign: "middle", margin: 0
+    });
+
+    // What is an ACL
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 1.4, w: 9.4, h: 0.55, fill: { color: C.panel2 }, line: { color: C.orange, width: 1 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 1.4, w: 0.06, h: 0.55, fill: { color: C.orange }, line: { color: C.orange, width: 0 } });
+    s.addText("Access Control Lists (ACLs) define which traffic is PERMITTED or DENIED between network segments — implemented on routers, L3 switches, and firewalls.", {
+      x: 0.5, y: 1.4, w: 9.1, h: 0.55, fontSize: 11, color: C.white, fontFace: "Calibri", valign: "middle", margin: 0
+    });
+
+    // ACL table
+    s.addText("Example ACL Ruleset — Printer VLAN (192.168.40.0/28):", { x: 0.3, y: 2.08, w: 9.4, h: 0.28, fontSize: 10, color: C.orange, fontFace: "Consolas", bold: true, margin: 0 });
+
+    const aclData = [
+      [
+        { text: "#", options: { bold: true, color: C.white, fill: { color: C.blue } } },
+        { text: "ACTION", options: { bold: true, color: C.white, fill: { color: C.blue } } },
+        { text: "SOURCE", options: { bold: true, color: C.white, fill: { color: C.blue } } },
+        { text: "DESTINATION", options: { bold: true, color: C.white, fill: { color: C.blue } } },
+        { text: "PORT/PROTO", options: { bold: true, color: C.white, fill: { color: C.blue } } },
+        { text: "REASON", options: { bold: true, color: C.white, fill: { color: C.blue } } },
+      ],
+      ["10", { text: "PERMIT", options: { color: C.green, fill: { color: C.panel2 } } }, "192.168.40.0/28", "192.168.20.0/24", "TCP 9100", { text: "Allow print jobs from workstations", options: { color: C.gray, fill: { color: C.panel2 } } }],
+      ["20", { text: "PERMIT", options: { color: C.green, fill: { color: C.panel } } }, "192.168.40.0/28", "192.168.30.5", "TCP 25", { text: "Allow printer→mail server for scan-to-email", options: { color: C.gray, fill: { color: C.panel } } }],
+      ["30", { text: "DENY", options: { bold: true, color: C.red, fill: { color: C.panel2 } } }, "192.168.40.0/28", "0.0.0.0/0", "TCP 445", { text: "Block SMB — prevent NTLMv2 capture!", options: { color: C.red, fill: { color: C.panel2 } } }],
+      ["40", { text: "DENY", options: { bold: true, color: C.red, fill: { color: C.panel } } }, "192.168.40.0/28", "0.0.0.0/0", "ALL", { text: "Block all other internet access", options: { color: C.red, fill: { color: C.panel } } }],
+      ["50", { text: "DENY", options: { bold: true, color: C.red, fill: { color: C.panel2 } } }, "192.168.40.0/28", "192.168.30.0/25", "ALL", { text: "Printer cannot reach server segment", options: { color: C.red, fill: { color: C.panel2 } } }],
+    ];
+    s.addTable(aclData, {
+      x: 0.3, y: 2.4, w: 9.4, h: 2.0,
+      rowH: 0.32,
+      border: { pt: 1, color: C.gray3 },
+      fontFace: "Consolas", fontSize: 8.5
+    });
+
+    // iptables snippet
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.3, y: 4.52, w: 9.4, h: 0.78, fill: { color: "050D1A" }, line: { color: C.green, width: 1 } });
+    s.addText("LINUX FIREWALL EQUIVALENT (iptables):", { x: 0.45, y: 4.52, w: 9.1, h: 0.22, fontSize: 8, color: C.green, fontFace: "Consolas", bold: true, margin: 0 });
+    s.addText("# Block printer subnet from reaching SMB ports on all hosts\niptables -A FORWARD -s 192.168.40.0/28 -p tcp --dport 445 -j DROP\niptables -A FORWARD -s 192.168.40.0/28 -d 0.0.0.0/0 -j DROP", {
+      x: 0.45, y: 4.73, w: 9.1, h: 0.55, fontSize: 8.5, color: C.green, fontFace: "Consolas", margin: 0
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 13 — PRACTICAL LAB: WIRESHARK + NMAP
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0, w: 10, h: 0.6, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0.6, w: 10, h: 0.04, fill: { color: C.teal }, line: { color: C.teal, width: 0 } });
+    s.addText("MODULE 01  |  NETWORKING OVERVIEW", { x: 0.3, y: 0, w: 6, h: 0.6, fontSize: 9, color: C.gray, fontFace: "Consolas", valign: "middle", charSpacing: 2, margin: 0 });
+    s.addText("SLIDE 13 / 14", { x: 7, y: 0, w: 2.7, h: 0.6, fontSize: 9, color: C.teal, fontFace: "Consolas", align: "right", valign: "middle", charSpacing: 2, margin: 0 });
+
+    s.addImage({ data: iconSearch, x: 0.3, y: 0.77, w: 0.45, h: 0.45 });
+    s.addText("Practical Lab: Wireshark & Nmap Analysis", {
+      x: 0.85, y: 0.75, w: 9, h: 0.5,
+      fontSize: 20, color: C.white, fontFace: "Arial Black", bold: true, valign: "middle", margin: 0
+    });
+
+    // Wireshark section
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.2, y: 1.4, w: 4.7, h: 3.85, fill: { color: C.panel }, line: { color: C.teal, width: 1 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0.2, y: 1.4, w: 4.7, h: 0.3, fill: { color: C.teal, transparency: 70 }, line: { color: C.teal, width: 0 } });
+    s.addText("WIRESHARK — PACKET CAPTURE", { x: 0.3, y: 1.4, w: 4.5, h: 0.3, fontSize: 9, color: C.teal, fontFace: "Consolas", bold: true, valign: "middle", margin: 0 });
+
+    // Simulated packet rows
+    const packets = [
+      { no: "1", time: "0.000", src: "192.168.1.100", dst: "8.8.8.8", proto: "DNS", info: "Standard query A hackthebox.eu" },
+      { no: "2", time: "0.012", src: "8.8.8.8", dst: "192.168.1.100", proto: "DNS", info: "Standard query response A 104.26.10.50" },
+      { no: "3", time: "0.015", src: "192.168.1.100", dst: "104.26.10.50", proto: "TCP", info: "SYN [SYN] Seq=0 Win=64240" },
+      { no: "4", time: "0.028", src: "104.26.10.50", dst: "192.168.1.100", proto: "TCP", info: "SYN-ACK [SYN, ACK] Seq=0 Ack=1" },
+      { no: "5", time: "0.029", src: "192.168.1.100", dst: "104.26.10.50", proto: "TLS", info: "Client Hello (TLSv1.3)" },
+    ];
+    const pktHeaders = ["No.", "Time", "Source", "Destination", "Proto", "Info"];
+    const pktWidths = [0.25, 0.4, 1.0, 1.0, 0.45, 1.5];
+    // Header row
+    let xStart = 0.25;
+    pktHeaders.forEach((h, j) => {
+      s.addShape(pres.shapes.RECTANGLE, { x: xStart, y: 1.75, w: pktWidths[j], h: 0.22, fill: { color: C.teal, transparency: 60 }, line: { color: C.teal, width: 0.5 } });
+      s.addText(h, { x: xStart, y: 1.75, w: pktWidths[j], h: 0.22, fontSize: 7, color: C.white, fontFace: "Consolas", bold: true, align: "center", valign: "middle", margin: 0 });
+      xStart += pktWidths[j] + 0.01;
+    });
+
+    packets.forEach((pkt, i) => {
+      const vals = [pkt.no, pkt.time, pkt.src, pkt.dst, pkt.proto, pkt.info];
+      const rowColor = i % 2 === 0 ? "0A1020" : "0D1525";
+      const protoColor = pkt.proto === "DNS" ? C.teal : pkt.proto === "TLS" ? C.purple : C.blue2;
+      let xc = 0.25;
+      vals.forEach((v, j) => {
+        s.addShape(pres.shapes.RECTANGLE, { x: xc, y: 2.0 + i * 0.26, w: pktWidths[j], h: 0.24, fill: { color: rowColor }, line: { color: C.gray3, width: 0.3 } });
+        s.addText(v, {
+          x: xc, y: 2.0 + i * 0.26, w: pktWidths[j], h: 0.24,
+          fontSize: 7, color: j === 4 ? protoColor : C.white,
+          fontFace: "Consolas", align: j === 5 ? "left" : "center", valign: "middle", margin: 0
+        });
+        xc += pktWidths[j] + 0.01;
+      });
+    });
+
+    s.addText("DISPLAY FILTER EXAMPLES:", { x: 0.25, y: 3.37, w: 4.5, h: 0.22, fontSize: 8, color: C.teal, fontFace: "Consolas", bold: true, margin: 0 });
+    const filters = [
+      "dns                         ← DNS traffic only",
+      "tcp.port == 445             ← SMB traffic (red flag!)",
+      "ip.addr == 192.168.40.0/28  ← Printer VLAN",
+      "http.request.method == POST ← POST requests",
+    ];
+    filters.forEach((f, i) => {
+      s.addShape(pres.shapes.RECTANGLE, { x: 0.25, y: 3.62 + i * 0.33, w: 4.6, h: 0.3, fill: { color: "050D1A" }, line: { color: C.gray3, width: 0.3 } });
+      s.addText(f, { x: 0.32, y: 3.62 + i * 0.33, w: 4.5, h: 0.3, fontSize: 8.5, color: C.green, fontFace: "Consolas", valign: "middle", margin: 0 });
+    });
+
+    // Nmap section
+    s.addShape(pres.shapes.RECTANGLE, { x: 5.1, y: 1.4, w: 4.7, h: 3.85, fill: { color: C.panel }, line: { color: C.orange, width: 1 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 5.1, y: 1.4, w: 4.7, h: 0.3, fill: { color: C.orange, transparency: 70 }, line: { color: C.orange, width: 0 } });
+    s.addText("NMAP — NETWORK RECONNAISSANCE", { x: 5.2, y: 1.4, w: 4.5, h: 0.3, fontSize: 9, color: C.orange, fontFace: "Consolas", bold: true, valign: "middle", margin: 0 });
+
+    const nmapCommands = [
+      { cmd: "nmap -sn 192.168.1.0/24", desc: "Host discovery — ping sweep\nNo port scan. Find live hosts." },
+      { cmd: "nmap -sV -p 22,80,443 10.20.0.1", desc: "Version scan on specific ports\nDetects service & version." },
+      { cmd: "nmap -sS -T4 192.168.1.0/24", desc: "Stealth SYN scan (fast)\nHalf-open connections." },
+      { cmd: "nmap -sV --script=banner 10.20.0.10", desc: "Banner grabbing via NSE\nGrabs service banners." },
+      { cmd: "nmap -A 192.168.1.100", desc: "Aggressive: OS detect + version\n+ scripts + traceroute." },
+    ];
+    nmapCommands.forEach((nc, i) => {
+      s.addShape(pres.shapes.RECTANGLE, { x: 5.15, y: 1.78 + i * 0.68, w: 4.6, h: 0.62, fill: { color: "050D1A" }, line: { color: C.gray3, width: 0.5 } });
+      s.addShape(pres.shapes.RECTANGLE, { x: 5.15, y: 1.78 + i * 0.68, w: 0.04, h: 0.62, fill: { color: C.orange }, line: { color: C.orange, width: 0 } });
+      s.addText("$ " + nc.cmd, { x: 5.25, y: 1.8 + i * 0.68, w: 4.4, h: 0.25, fontSize: 8.5, color: C.orange, fontFace: "Consolas", margin: 0 });
+      s.addText(nc.desc, { x: 5.25, y: 2.04 + i * 0.68, w: 4.4, h: 0.35, fontSize: 8, color: C.gray, fontFace: "Calibri", margin: 0 });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // SLIDE 14 — KEY TAKEAWAYS & SUMMARY
+  // ─────────────────────────────────────────────────────────────────
+  {
+    const s = pres.addSlide();
+    s.background = { color: C.bg };
+
+    // Grid decoration
+    for (let i = 0; i < 8; i++) {
+      s.addShape(pres.shapes.LINE, { x: i * 1.4, y: 0, w: 0, h: 5.625, line: { color: "1E3A5F", width: 0.5, transparency: 70 } });
+    }
+
+    // Bottom cyan bar
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 5.3, w: 10, h: 0.325, fill: { color: C.panel }, line: { color: C.panel, width: 0 } });
+    s.addShape(pres.shapes.RECTANGLE, { x: 0, y: 5.3, w: 10, h: 0.04, fill: { color: C.cyan }, line: { color: C.cyan, width: 0 } });
+    s.addText("HTB ACADEMY  |  Networking Overview  |  Module Complete  |  +10 Points", {
+      x: 0.3, y: 5.34, w: 9.4, h: 0.28, fontSize: 8.5, color: C.gray, fontFace: "Consolas", align: "center", charSpacing: 1, margin: 0
+    });
+
+    // Title
+    s.addText("KEY TAKEAWAYS", { x: 0.3, y: 0.2, w: 9.4, h: 0.55, fontSize: 30, color: C.cyan, fontFace: "Arial Black", bold: true, charSpacing: 3, margin: 0 });
+    s.addText("Module 01 — Networking Overview for Cybersecurity", { x: 0.3, y: 0.75, w: 9.4, h: 0.3, fontSize: 11, color: C.gray, fontFace: "Consolas", margin: 0 });
+
+    s.addShape(pres.shapes.LINE, { x: 0.3, y: 1.12, w: 9.4, h: 0, line: { color: C.gray3, width: 1 } });
+
+    // 6 takeaway cards
+    const takeaways = [
+      { num: "01", title: "Always Verify Subnets", body: "Never assume /24. Use 'ip a' and 'ip route' to confirm your exact subnet before scanning. Missing a /25 split can hide an entire server segment.", color: C.cyan },
+      { num: "02", title: "Segment Every Network", body: "Printers, servers, workstations, IP phones, and infrastructure must live in separate VLANs with ACLs between them. Flat networks are fundamentally insecure.", color: C.green },
+      { num: "03", title: "DNS is Critical", body: "Every connection starts with DNS. Understand the full resolution chain. Monitor DNS traffic for data exfiltration and C2 communication via DNS tunneling.", color: C.teal },
+      { num: "04", title: "Printers Are Attack Surfaces", body: "NTLMv2 relay attacks via printers are real. Block port 445 from printer VLANs. Never connect printers to flat networks or allow internet access.", color: C.red },
+      { num: "05", title: "IDS/IPS as a Deterrent", body: "Suricata and Snort detect and block port scans, exploit traffic, and anomalies. Proper placement (inline for IPS) is critical for active protection.", color: C.orange },
+      { num: "06", title: "ACLs Are Your Defense Layer", body: "Define explicit PERMIT/DENY rules between segments. Default-deny approach means everything blocked unless explicitly permitted. Audit rules regularly.", color: C.purple },
+    ];
+
+    takeaways.forEach((t, i) => {
+      const xp = 0.2 + (i % 3) * 3.28;
+      const yp = 1.22 + Math.floor(i / 3) * 1.95;
+      s.addShape(pres.shapes.RECTANGLE, { x: xp, y: yp, w: 3.1, h: 1.75, fill: { color: C.panel }, line: { color: t.color, width: 1 } });
+      s.addShape(pres.shapes.RECTANGLE, { x: xp, y: yp, w: 3.1, h: 0.04, fill: { color: t.color }, line: { color: t.color, width: 0 } });
+      // Number badge
+      s.addShape(pres.shapes.RECTANGLE, { x: xp + 0.08, y: yp + 0.1, w: 0.38, h: 0.38, fill: { color: t.color, transparency: 30 }, line: { color: t.color, width: 0.5 } });
+      s.addText(t.num, { x: xp + 0.08, y: yp + 0.1, w: 0.38, h: 0.38, fontSize: 11, color: C.white, fontFace: "Arial Black", align: "center", valign: "middle", bold: true, margin: 0 });
+      s.addText(t.title, { x: xp + 0.55, y: yp + 0.1, w: 2.5, h: 0.38, fontSize: 10, color: t.color, fontFace: "Consolas", bold: true, valign: "middle", margin: 0 });
+      s.addShape(pres.shapes.LINE, { x: xp + 0.08, y: yp + 0.55, w: 2.92, h: 0, line: { color: C.gray3, width: 0.5 } });
+      s.addText(t.body, { x: xp + 0.08, y: yp + 0.62, w: 2.95, h: 1.05, fontSize: 9, color: C.white, fontFace: "Calibri", margin: 0 });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────
+  // WRITE FILE
+  // ─────────────────────────────────────────────────────────────────
+  await pres.writeFile({ fileName: "/home/claude/Networking_Overview_CyberSec.pptx" });
+  console.log("DONE: Networking_Overview_CyberSec.pptx written.");
+}
+
+buildPresentation().catch(console.error);

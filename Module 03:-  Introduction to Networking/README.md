@@ -84,19 +84,7 @@ After completing this module, you will understand:
 ✅ Basic traffic analysis concepts
 ✅ Core cybersecurity networking foundations
 
-📂 Repository Structure
-📁 Module-3-Part-1
- ┣ 📁 Slides
- ┃ ┣ 📄 Networking_Overview.pdf
- ┃ ┣ 📄 Slide_Images
- ┃ ┗ 📄 Presentation.pptx
- ┣ 📁 Notes
- ┃ ┗ 📄 Networking_Notes.pdf
- ┣ 📁 Labs
- ┃ ┣ 📄 Nmap_Basics.txt
- ┃ ┣ 📄 Wireshark_Intro.txt
- ┃ ┗ 📄 SSH_Practice.txt
- ┗ 📄 README.md
+
 🚀 Why Networking Matters in Cybersecurity
 
 Understanding networking is one of the most important skills in cybersecurity because:
@@ -171,17 +159,7 @@ Packet Sniffing
 WPA2 / WPA3
 Secure Communication
 Network Protection
-📂 Module Structure
-📁 Networking-Topologies-And-Connections
- ┣ 📄 README.md
- ┣ 📁 Slides
- ┃ ┣ 📄 Slide-11.png
- ┃ ┣ 📄 Slide-12.png
- ┃ ┣ 📄 Slide-13.png
- ┃ ┣ 📄 ...
- ┃ ┗ 📄 Slide-20.png
- ┗ 📁 Notes
-    ┗ 📄 Networking_Connections_Notes.pdf
+
 ⚡ Features
 
 ✅ Futuristic Cyber UI Slides

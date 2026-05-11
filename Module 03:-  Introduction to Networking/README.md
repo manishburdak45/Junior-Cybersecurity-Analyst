@@ -190,3 +190,146 @@ GitHub
 <p align="center"> <img src="https://img.shields.io/badge/Created%20By-%40manishburdak45-00F7FF?style=for-the-badge" /> </p>
 ⭐ Stay Curious. Stay Secure.
 <p align="center"> <img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&size=22&duration=2500&color=00F7FF&center=true&vCenter=true&width=700&lines=Keep+Learning...;Keep+Building...;Keep+Securing..." /> </p>
+
+
+
+🚀 Introduction to Networking — OSI, TCP/IP, TCP vs UDP
+<div align="center">
+🌐 Networking Fundamentals for Cybersecurity
+Understanding how devices communicate across networks using
+OSI Model, TCP/IP Model, Packet Transfer, TCP & UDP
+<img src="https://readme-typing-svg.herokuapp.com?font=Orbitron&size=24&duration=2500&pause=1000&color=00F7FF&center=true&vCenter=true&width=900&lines=Networking+Models+%7C+OSI+%26+TCP%2FIP;Packet+Transfer+%26+Encapsulation;TCP+vs+UDP+Deep+Dive;Cybersecurity+Networking+Fundamentals;Built+for+Learning+%26+Revision" />
+
+
+
+
+
+
+
+
+</div>
+📘 About This Project
+
+This repository contains visually designed educational presentation slides focused on:
+
+🌐 OSI Model
+🌍 TCP/IP Model
+📦 Packet Transfer
+🔒 Encapsulation & De-encapsulation
+⚡ TCP vs UDP
+📡 Transport Layer Concepts
+🧠 Real-world Networking Scenarios
+🛡️ Cybersecurity Networking Basics
+
+The slides are designed using a futuristic cyber-security theme for:
+
+learning,
+revision,
+presentations,
+interview preparation,
+cybersecurity fundamentals.
+🧠 Topics Covered
+🔹 Networking Models
+Why networking models exist
+Layered communication
+OSI vs TCP/IP comparison
+🔹 OSI Model (7 Layers)
+Layer	Purpose
+Application	User interaction
+Presentation	Encryption & formatting
+Session	Session management
+Transport	TCP/UDP communication
+Network	IP routing
+Data-Link	MAC communication
+Physical	Binary transmission
+🔹 TCP/IP Model
+Application Layer
+Transport Layer
+Internet Layer
+Link Layer
+🔹 Packet Transfer
+Data
+Segment
+Packet
+Frame
+Bit
+🔹 Encapsulation Process
+Data
+↓
+TCP Header
+↓
+IP Header
+↓
+MAC Header
+↓
+Binary Transmission
+🔹 TCP vs UDP
+TCP	UDP
+Reliable	Fast
+Connection-Oriented	Connectionless
+Ordered Delivery	No Order Guarantee
+Error Recovery	No Recovery
+Higher Overhead	Lightweight
+🎯 Real-World Examples
+TCP
+🌐 Web Browsing
+📧 Email
+💳 Online Banking
+📁 File Transfer
+🔐 HTTPS
+UDP
+🎮 Online Gaming
+📺 Video Streaming
+📞 VoIP Calls
+📡 Live Broadcast
+🌍 DNS Queries
+🛠️ Tools & Concepts Related
+🧪 Wireshark
+📡 Packet Analysis
+🔒 Network Security
+🌐 Routing & Switching
+🧠 Network Traffic Analysis
+📂 Repository Structure
+📦 Networking-Fundamentals
+ ┣ 📜 README.md
+ ┣ 📁 Slides
+ ┃ ┣ 📄 Networking_Models.pdf
+ ┃ ┣ 📄 TCP_vs_UDP.pdf
+ ┃ ┗ 📄 Packet_Transfer.pdf
+ ┗ 📁 Images
+🎨 Presentation Style
+
+✅ Futuristic Cybersecurity Theme
+✅ Neon Blue / Dark UI
+✅ PowerPoint 16:9 Format
+✅ Infographic Style
+✅ Cyberpunk Visual Design
+✅ Learning-focused Layouts
+
+🎓 Learning Goals
+
+After completing these slides, you will understand:
+
+How data travels across networks
+How OSI and TCP/IP models work
+Difference between TCP and UDP
+Packet structure basics
+Real-world protocol usage
+Networking concepts useful in cybersecurity
+⚡ Ideal For
+Cybersecurity Students
+Networking Beginners
+Ethical Hackers
+Penetration Testers
+Presentation Projects
+Technical Revision
+📌 Key Takeaway
+
+Understanding networking is the foundation of cybersecurity.
+
+<div align="center">
+🌌 Keep Learning • Keep Building • Keep Securing
+⭐ If you found this project useful, consider starring the repository.
+👨‍💻 Created By
+@manishburdak45
+</div>

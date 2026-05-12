@@ -333,3 +333,122 @@ Understanding networking is the foundation of cybersecurity.
 👨‍💻 Created By
 @manishburdak45
 </div>
+# module 3 part 4 
+🌐 Subnetting & Network Layer Masterclass
+<p align="center"> <img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=28&pause=1000&color=00F7FF&center=true&vCenter=true&width=900&lines=Subnetting+%7C+CIDR+%7C+IPv4+%7C+Network+Layer;Cybersecurity+Focused+Networking+Presentation;Learn+Routing%2C+Broadcast%2C+VLSM+%26+More;Built+with+Futuristic+Cyber+Infographic+Style" alt="Typing SVG" /> </p>
+🚀 Overview
+
+This repository contains a high-quality cyber-themed networking presentation focused on:
+
+🌍 Network Layer (OSI Layer 3)
+📡 IPv4 Addressing
+🧠 Binary Basics
+🎯 CIDR Notation
+🔥 Subnetting
+📢 Broadcast Address
+🧩 VLSM
+🌐 Supernetting
+🛡️ Networking for Cyber Security
+🧮 Real Numerical Examples
+⚡ Fast Subnetting Tricks
+
+The slides are designed in a modern futuristic infographic style with a professional cyber-security aesthetic.
+
+🖼️ Presentation Style
+
+✔ Dark Cyber Theme
+✔ Neon UI Elements
+✔ Futuristic Infographics
+✔ PowerPoint-Style Layouts
+✔ Beginner Friendly
+✔ Numericals Explained Visually
+✔ Clean Technical Design
+
+📚 Topics Covered
+#	Topic
+1	IPv4 Basics
+2	Private vs Public IP
+3	IPv4 vs MAC Address
+4	CIDR Notation
+5	Subnetting Fundamentals
+6	Broadcast Address
+7	Static vs Dynamic IP
+8	Subnet Mask
+9	Step-by-Step Subnetting
+10	VLSM
+11	Supernetting
+12	Practice Questions
+13	Final Networking Cheat Sheet
+⚡ Skills You Will Learn
+✔ Network Understanding
+✔ IP Addressing
+✔ Binary Thinking
+✔ CIDR Calculation
+✔ Broadcast Calculation
+✔ Subnet Division
+✔ VLSM Design
+✔ Routing Concepts
+✔ Cybersecurity Networking Basics
+🎯 Numerical Problems Included
+
+The presentation also includes practical subnetting questions like:
+
+10.200.20.0/27
+
+✔ Subnet Mask Calculation
+✔ Broadcast Address Finding
+✔ Splitting Networks into Subnets
+✔ Finding Network IDs
+✔ Host Range Calculation
+
+🛠️ Best For
+🎓 Students
+🛡️ Cyber Security Beginners
+🌐 Networking Learners
+📘 CCNA Beginners
+💻 Self Learners
+🚀 Tech Presentations
+📸 Preview
+<p align="center"> <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2E5d2c0eWhsZTF5M3Nzc2J1NjM3bG1pN2Q2Y3p2ODN4dnR2Nm84NSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l3vRfNA1p0rvhMSvS/giphy.gif" width="700"/> </p>
+🌌 Cyber Networking Mindset
+
+“Understand deeply.
+Plan smart.
+Calculate carefully.
+Verify always.”
+
+📂 Repository Structure
+📁 subnetting-masterclass
+ ┣ 📂 slides
+ ┣ 📂 assets
+ ┣ 📄 README.md
+ ┗ 📄 presentation.pptx
+⭐ Features
+✔ Easy-to-understand visuals
+✔ Real networking examples
+✔ Cyberpunk presentation design
+✔ Modern infographic layouts
+✔ Numerical subnetting walkthroughs
+✔ Ready for GitHub showcase
+🔥 Future Improvements
+ Animated PPT Version
+ Packet Tracer Labs
+ Wireshark Examples
+ Nmap Demonstrations
+ IPv6 Version
+ Interactive Subnetting Practice
+🤝 Contributing
+
+Feel free to:
+
+Improve designs
+Add labs
+Add subnetting questions
+Create animations
+Add cybersecurity examples
+📜 License
+
+This project is open-source and available for learning and educational purposes.
+
+<p align="center"> <img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=22&pause=1000&color=00FFAA&center=true&vCenter=true&width=800&lines=Think+Binary.+Build+Networks.;Subnet+Smart.+Route+Faster.;Cybersecurity+Starts+With+Networking." alt="Typing SVG" /> </p>
+<p align="center"> ⚡ Built with passion for Networking & Cyber Security ⚡ </p>

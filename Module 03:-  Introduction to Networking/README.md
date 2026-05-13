@@ -455,3 +455,126 @@ This project is open-source and available for learning and educational purposes.
 
 <p align="center"> <img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=22&pause=1000&color=00FFAA&center=true&vCenter=true&width=800&lines=Think+Binary.+Build+Networks.;Subnet+Smart.+Route+Faster.;Cybersecurity+Starts+With+Networking." alt="Typing SVG" /> </p>
 <p align="center"> ⚡ Built with passion for Networking & Cyber Security ⚡ </p>
+
+## MODULE 3 PART 5 
+
+🌐 Network Layer & Subnetting Masterclass
+<p align="center"> <img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=28&pause=1000&color=00F7FF&center=true&vCenter=true&width=900&lines=Networking+%7C+Subnetting+%7C+CIDR+%7C+IPv4;Cybersecurity+Focused+Networking+Presentation;Learn+IP+Addressing+Like+A+Pro;Modern+Cyber+Infographic+Style" /> </p>
+🚀 About This Project
+
+This repository contains a complete Networking & Subnetting Presentation designed in a futuristic cyber-security infographic style.
+
+The presentation explains networking concepts visually with:
+
+diagrams
+subnetting calculations
+CIDR tricks
+IP addressing
+broadcast/network calculations
+cybersecurity-focused explanations
+
+Perfect for:
+
+Students
+Networking Beginners
+Cyber Security Learners
+CCNA Aspirants
+Technical Presentations
+📚 Topics Covered
+✔ OSI Model
+✔ Network Layer
+✔ IPv4 Addressing
+✔ Public vs Private IP
+✔ MAC Addressing
+✔ CIDR Notation
+✔ Subnet Mask
+✔ Broadcast Address
+✔ Subnetting
+✔ VLSM
+✔ Supernetting
+✔ Static vs Dynamic IP
+✔ Binary Basics
+✔ Real Numerical Questions
+✔ Cybersecurity Networking Concepts
+🧠 Numerical Practice Included
+
+The PPT includes step-by-step solutions for questions like:
+
+10.200.20.0/27
+
+Including:
+
+Subnet Mask
+Broadcast Address
+Network Address
+Usable Hosts
+Splitting into Subnets
+Block Size Calculation
+🎨 Presentation Style
+✔ Futuristic UI
+✔ Cyberpunk Theme
+✔ Neon Colors
+✔ Dark Technical Design
+✔ PowerPoint-Style Layout
+✔ High Quality Infographics
+✔ Visual Learning Focused
+📂 Project Structure
+📁 Networking-Subnetting-Masterclass
+ ┣ 📂 Slides
+ ┣ 📂 Assets
+ ┣ 📄 README.md
+ ┗ 📄 Presentation.pptx
+⚡ Key Learning Outcomes
+Understand IP Addressing deeply
+Learn practical subnetting
+Solve CIDR numericals quickly
+Understand routing concepts
+Build strong networking fundamentals
+Improve cybersecurity networking knowledge
+🛡️ Cybersecurity Concepts Included
+
+This project also touches:
+
+ARP
+MAC Addressing
+Broadcast Domains
+VLAN Concepts
+Network Segmentation
+MITM Basics
+Routing Security Concepts
+
+Inspired by advanced networking concepts like MAC, ARP & IPv6 covered in the uploaded networking module.
+
+🌌 Preview
+<p align="center"> <img src="https://media.giphy.com/media/l3vRfNA1p0rvhMSvS/giphy.gif" width="700"/> </p>
+💡 Why This Project?
+
+Most networking presentations are:
+
+boring
+text-heavy
+difficult for beginners
+
+This project focuses on:
+
+visual understanding
+infographic learning
+real examples
+clean explanations
+cyber-security style presentation design
+🔥 Future Improvements
+[ ] Animated Version
+[ ] Packet Tracer Labs
+[ ] Wireshark Demonstrations
+[ ] Nmap Examples
+[ ] IPv6 Deep Dive
+[ ] Interactive Practice Labs
+🏆 Final Takeaway
+
+“Understand deeply.
+Calculate carefully.
+Verify always.
+Practice more.”
+
+<p align="center"> <img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=22&pause=1000&color=00FFAA&center=true&vCenter=true&width=900&lines=Think+Binary.+Build+Networks.;Subnet+Smart.+Route+Faster.;Cybersecurity+Starts+With+Networking." /> </p>
+<p align="center"> ⚡ Built for Networking & Cyber Security Learning ⚡ </p>

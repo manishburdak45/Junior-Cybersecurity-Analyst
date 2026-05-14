@@ -578,3 +578,152 @@ Practice more.”
 
 <p align="center"> <img src="https://readme-typing-svg.demolab.com?font=Orbitron&size=22&pause=1000&color=00FFAA&center=true&vCenter=true&width=900&lines=Think+Binary.+Build+Networks.;Subnet+Smart.+Route+Faster.;Cybersecurity+Starts+With+Networking." /> </p>
 <p align="center"> ⚡ Built for Networking & Cyber Security Learning ⚡ </p>
+
+## Module 3 part 6 
+
+Common Protocols — Networking Notes
+<div align="center">
+🌐 Common Protocols
+Modern Networking & Cyber Security Notes
+<img src="https://img.shields.io/badge/Networking-Protocols-blue?style=for-the-badge"> <img src="https://img.shields.io/badge/Cyber-Security-black?style=for-the-badge"> <img src="https://img.shields.io/badge/TCP%2FUDP-Networking-success?style=for-the-badge"> <img src="https://img.shields.io/badge/Status-Completed-brightgreen?style=for-the-badge">
+🚀 Professional Networking Notes for Students & Beginners
+</div>
+📘 About This Project
+
+This repository contains detailed notes and presentation slides on Common Networking Protocols used in modern computer networks and cyber security.
+
+The project covers:
+
+TCP & UDP fundamentals
+Common network protocols
+Port numbers
+Protocol acronyms
+Real-world usage
+ICMP concepts
+VoIP & SIP basics
+Networking communication flow
+Security-related protocols
+
+These notes are designed for:
+
+✅ Cyber Security Students
+✅ Networking Beginners
+✅ Ethical Hacking Learners
+✅ CCNA Aspirants
+✅ IT & Computer Science Students
+
+📂 Topics Covered
+🔹 Transmission Control Protocol (TCP)
+Connection-oriented communication
+Three-Way Handshake
+Reliable communication
+TCP workflow
+Real-world examples
+🔹 User Datagram Protocol (UDP)
+Connectionless communication
+Fast transmission
+Streaming & gaming usage
+UDP workflow
+Reliability vs Speed comparison
+🔹 Common Protocols
+Protocol	Port	Usage
+HTTP	80	Web Communication
+HTTPS	443	Secure Web Communication
+FTP	20/21	File Transfer
+SSH	22	Secure Remote Access
+DNS	53	Domain Resolution
+SMTP	25	Email Sending
+POP3	110	Email Retrieval
+IMAP	143	Email Access
+DHCP	67/68	IP Address Assignment
+SNMP	161	Network Monitoring
+RDP	3389	Remote Desktop
+SIP	5060	VoIP Communication
+🔹 ICMP (Internet Control Message Protocol)
+Ping requests
+Echo reply
+TTL (Time To Live)
+Error handling
+Traceroute concepts
+🔹 VoIP & SIP
+Voice over IP basics
+SIP requests & methods
+Multimedia communication
+Session handling
+Real-world VoIP systems
+🎨 Presentation Style
+
+This project presentation uses:
+
+✨ Futuristic Cyber Security Theme
+✨ Neon Blue UI Design
+✨ Professional Infographic Layout
+✨ 16:9 PowerPoint Slide Format
+✨ Networking Visual Diagrams
+✨ Modern Cyber Aesthetic
+
+🛠️ Technologies & Concepts
+Networking
+TCP/IP
+UDP
+ICMP
+VoIP
+SIP
+Cyber Security
+Ports & Protocols
+Routing
+Remote Access
+VPN
+Network Monitoring
+📸 Preview
+🖥️ Slides Include
+Protocol Tables
+Networking Diagrams
+Port References
+TCP vs UDP Explanation
+ICMP Concepts
+VoIP Workflow
+Cyber Security Style UI
+🎯 Learning Outcome
+
+After studying these notes, you will understand:
+
+✔ How devices communicate in networks
+✔ TCP vs UDP differences
+✔ Common protocol usage
+✔ Important port numbers
+✔ Network troubleshooting basics
+✔ Communication protocols in cyber security
+
+📚 Educational Purpose
+
+This project is created for:
+
+Learning networking fundamentals
+Academic presentations
+Cyber security preparation
+Self-study & revision
+GitHub portfolio showcase
+👨‍💻 Author
+Manish Burdak
+Cyber Security Student & Networking Learner
+<div align="center">
+⭐ If you found this project useful, give it a star!
+🔥 Keep Learning • Keep Building • Keep Securing
+</div>
+📌 Repository Tags
+networking
+cyber-security
+tcp
+udp
+protocols
+network-protocols
+common-protocols
+ethical-hacking
+ccna
+network-security
+computer-networks
+icmp
+voip
+sip
+ports

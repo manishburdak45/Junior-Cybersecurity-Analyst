@@ -1,4 +1,4 @@
-<img width="1536" height="1024" alt="image" src="https://github.com/user-attachments/assets/676919c2-6b45-4ba5-9b0a-dcf4809ad7d5" />
+
 
 🌐 Module 3 — Part 1
 Networking Overview for Cybersecurity

@@ -16,9 +16,9 @@ It includes:
 ##  Repository Structure
 
 ```
- Module-01-Introduction-to-InfoSec
- Module-02-...
- Module-03-...
+Module-01-Introduction-to-InfoSec/
+Module-02-Network-Foundations/
+Module-03-Introduction-to-Networking/
 ```
 
 ---
@@ -214,6 +214,12 @@ Key concepts:
 
 ---
 
+## Module 03: Introduction to Networking (In Progress)
+
+Building a comprehensive understanding of networking fundamentals with a cybersecurity focus.
+
+---
+
 ## Practical Skills Gained
 
 * Understanding network communication end-to-end
@@ -248,8 +254,9 @@ For each module, I follow a structured process:
 
 ## Progress
 
-* Module 01 Completed
-* Module 02 Completed
+* Module 01 ✅ Completed
+* Module 02 ✅ Completed
+* Module 03 🔄 In Progress
 * Next: Advancing into deeper cybersecurity topics
 
 ---
@@ -259,4 +266,3 @@ For each module, I follow a structured process:
 To build a strong foundation in cybersecurity by combining theory, practical skills, and clear documentation.
 
 This repository reflects my learning journey and continuous improvement.
-

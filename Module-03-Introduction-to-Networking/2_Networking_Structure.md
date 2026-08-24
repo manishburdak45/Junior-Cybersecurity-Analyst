@@ -48,6 +48,7 @@ flowchart LR
 ## 03 — Key Components
 
 ### Common Terminology
+<img width="365" height="547" alt="image" src="https://github.com/user-attachments/assets/8a6f0351-b9d5-4625-95ec-af8910ea484f" />
 
 | Network Type | Definition |
 |---|---|
@@ -78,6 +79,7 @@ flowchart LR
 ---
 
 ## 04 — VPN Types
+<img width="656" height="467" alt="image" src="https://github.com/user-attachments/assets/3832bf4c-c2c4-4e3d-8211-a863f9eab3ba" />
 
 All three VPN types share one goal: make the user feel plugged into a remote network.
 

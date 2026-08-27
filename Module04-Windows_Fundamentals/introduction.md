@@ -109,6 +109,7 @@ RDP uses a **client/server architecture**:
 **IP address vs port analogy (as covered in the module):** a network subnet is like a street; an IP address is like a house on that street; logical ports are like the doors/windows used to reach specific applications inside that house.
 
 By default, **remote access is not enabled** on Windows out of the box — it must be explicitly turned on. HTB Academy pre-configures its Windows targets to permit RDP once connected via the Academy VPN.
+<img width="1920" height="1080" alt="window 1 " src="https://github.com/user-attachments/assets/b22399a6-6ac5-4290-90a7-05f7a6d2fabc" />
 
 **RDP client tools referenced:**
 

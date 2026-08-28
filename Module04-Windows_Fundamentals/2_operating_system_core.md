@@ -792,3 +792,908 @@ icacls c:\users /remove joe       :: revoke a previously granted permission
 ## What This Exercise Taught
 
 Correctly enumerating permissions is not the same as correctly answering a question about them. This session needed three attempts, but each rejection carried a distinct, useful signal: the first pointed to a category mismatch (system principal vs. named user), and the second pointed to a formatting mismatch (domain-qualified vs. bare username). Reading the question's exact wording again after every rejection — rather than guessing a variation blindly — was what converged on the correct, precisely-formatted answer.
+
+
+
+
+
+<div align="center">
+
+#  NTFS vs. Share Permissions (SMB)
+
+### Section 4 of the "Introduction to Windows" Learning Series
+
+`Theory: NTFS vs Share Permissions` -> `SMB Share Creation` -> `smbclient Enumeration` -> `Firewall Troubleshooting` -> `Remote Access Method Confusion` -> `Correction`
+
+</div>
+
+---
+
+## Overview
+
+This section covers the distinction between NTFS permissions and share permissions in Windows — two separate permission systems that often apply to the same shared resource but are frequently confused for being the same thing. It includes creating an SMB share on a Windows 10 target, enumerating and connecting to it with `smbclient` from a Linux attack host, troubleshooting a Windows Defender Firewall block, and mounting the share locally.
+
+This session also contains a genuine conceptual mix-up around **how remote access actually works** — specifically, a misunderstanding about whether running a command locally could make the local Linux terminal "become" the target user, which was corrected by clarifying the actual mechanics of RDP, SSH, and WinRM.
+
+> Note: This is a learning-module walkthrough. No exploitation or privilege escalation occurred. The scope was SMB/NTFS permission theory, share creation and access, and remote access method troubleshooting.
+
+---
+
+## Objective
+
+1. Understand the difference between NTFS permissions and share permissions, and how both apply simultaneously to a shared resource.
+2. Create and configure an SMB share on a Windows 10 target.
+3. Enumerate and connect to that share from a Linux attack host using `smbclient`.
+4. Diagnose and resolve a Windows Defender Firewall block preventing SMB access.
+5. Correctly understand the distinction between local command execution and remote shell access, and identify the correct method (RDP) for reaching the target as `htb-student`.
+
+---
+
+## Foundation & Theory
+
+### Why Windows Is a High-Value Malware Target
+
+Microsoft holds over 70% of the global desktop operating system market share. This is a direct business incentive for malware authors: writing malware for the platform with the largest install base maximizes potential impact, which is why Windows is so frequently targeted and often perceived as "less secure" than other operating systems.
+
+> Technical Note: no operating system is immune to malware by design — if software can be written for a platform, malicious software can be written for it too. Windows' reputation is a function of market share and attacker incentive, not an inherent architectural weakness exclusive to it.
+
+A concrete and still-relevant example: the **EternalBlue** vulnerability continues to affect unpatched systems running SMBv1, and remains a common entry point for ransomware.
+
+### SMB — The Protocol Behind File Sharing
+
+The **Server Message Block (SMB)** protocol is what Windows uses to share resources like files and printers across a network, in environments of every size from small business to large enterprise.
+
+```text
+[Client] --SMB Request--> [Server]
+                              |
+                              v
+                    [File System / Printer]
+                              |
+                              v
+[Client] <--Directory/File Data-- [Server]
+```
+
+### NTFS Permissions vs. Share Permissions — The Core Distinction
+
+These are commonly assumed to be the same thing. **They are not.** Both can apply to the same shared folder simultaneously, but they govern access differently depending on *how* that folder is being accessed.
+
+| Access Path | Which Permissions Apply |
+|---|---|
+| Accessing the folder over the network via SMB (a network share) | **Both** Share permissions AND NTFS permissions |
+| Accessing the folder locally, or via RDP session logged into the machine directly | **Only** NTFS permissions (share permissions are irrelevant here — SMB isn't involved) |
+
+This means NTFS permissions are the more granular, more consistently-enforced control — they apply no matter how the resource is accessed. Share permissions only come into play specifically when SMB is the access method.
+
+#### Share Permissions
+
+| Permission | Description |
+|---|---|
+| **Full Control** | Everything in Change and Read, plus the ability to change NTFS permissions on files/subfolders. |
+| **Change** | Read, edit, delete, and add files and subfolders. |
+| **Read** | View file and subfolder contents only. |
+
+#### NTFS Basic Permissions
+
+| Permission | Description |
+|---|---|
+| **Full Control** | Add, edit, move, delete files/folders; change NTFS permissions on all allowed folders. |
+| **Modify** | View and modify files/folders, including adding/deleting. |
+| **Read & Execute** | Read file contents and execute programs. |
+| **List Folder Contents** | View a listing of files and subfolders. |
+| **Read** | Read file contents. |
+| **Write** | Write changes to a file, add new files to a folder. |
+| **Special Permissions** | Advanced, more granular permission options (below). |
+
+#### NTFS Special Permissions
+
+| Permission | Description |
+|---|---|
+| **Full Control** | Add, edit, move, delete files/folders; change NTFS permissions on all permitted folders. |
+| **Traverse Folder / Execute File** | Access a subfolder deeper in a directory structure even without access to the parent folder's own contents; execute programs. |
+| **List Folder / Read Data** | View files/folders within the parent folder; open and view files. |
+| **Read Attributes** | View basic attributes (system, archive, read-only, hidden). |
+| **Read Extended Attributes** | View program-specific extended attributes. |
+| **Create Files / Write Data** | Create files within a folder; modify a file. |
+| **Create Folders / Append Data** | Create subfolders; add data to files without overwriting existing content. |
+| **Write Attributes** | Change file attributes (does not grant file/folder creation rights). |
+| **Write Extended Attributes** | Change program-specific extended attributes. |
+| **Delete Subfolders and Files** | Delete subfolders/files, without deleting the parent folder. |
+| **Delete** | Delete the parent folder, its subfolders, and files. |
+| **Read Permissions** | View the permissions currently set on a folder. |
+| **Change Permissions** | Modify the permissions set on a file or folder. |
+| **Take Ownership** | Take ownership of a file/folder — the owner automatically gains full permission-changing rights. |
+
+> Real-World Analogy: system administrators effectively hold the keys to what every user and group can or cannot do across an organization's network resources. This is precisely why spear-phishing campaigns are so often aimed at sysadmins and other IT leadership — compromising one such account can grant far more effective control over an environment than compromising a non-technical executive account, even one with a high-ranking title. A hospital's doctors or executives, for instance, will not hold administrative rights over the network — the system administrators will.
+
+**Inheritance:** NTFS permissions are inherited from the parent directory by default. In Windows, `C:\` is effectively the root parent for this inheritance chain unless an administrator explicitly disables inheritance on a specific folder's Advanced Security settings. A gray checkmark next to a permission in the GUI indicates it was inherited rather than explicitly set.
+
+---
+
+## Practical Walkthrough — Creating and Testing an SMB Share
+
+### Creating the Share (GUI)
+
+A new folder ("Company Data") was created on the Windows 10 target's desktop and configured via **Advanced Sharing**. The share name defaulted automatically to the folder's name, and Windows also allows limiting the number of simultaneous connections to the share — a setting real environments typically tune based on actual expected user load.
+
+> Technical Note: in large enterprise environments, shares are normally hosted on a SAN, NAS, or a Windows Server partition — not a desktop OS. Finding a share hosted directly on a desktop machine in the field is a signal worth investigating: it typically indicates either a small business environment or a beachhead system being used to stage/exfiltrate data (by a penetration tester or an actual attacker).
+
+The share's Access Control List (ACL) — its Share Permissions list — was left at its default: the **Everyone** group with **Read** access.
+
+### Enumerating Shares with smbclient
+
+```bash
+smbclient -L SERVER_IP -U htb-student
+```
+
+**Purpose:** Lists all SMB shares available on the target from the Linux attack host.
+
+**Observed Result:**
+
+```text
+Enter WORKGROUP\htb-student's password:
+
+    Sharename       Type      Comment
+    ---------       ----      -------
+    ADMIN$          Disk      Remote Admin
+    C$              Disk      Default share
+    Company Data    Disk
+    IPC$            IPC       Remote IPC
+```
+
+**Interpretation:** The custom `Company Data` share is visible, alongside Windows' built-in administrative shares — `ADMIN$` (remote admin access to `C:\WINDOWS`) and, notably, `C$` (the entire `C:\` drive, shared automatically by Windows at install, without any manual configuration).
+
+> Critical Finding: `C$` being shared by default means the entire C: drive of every Windows system on a network is technically remotely reachable via SMB by anyone with the correct access — this is worth remembering during any Windows-focused assessment, since it is not something an administrator necessarily configured intentionally.
+
+### Connecting to the Share
+
+```bash
+smbclient '\\SERVER_IP\Company Data' -U htb-student
+```
+
+**Observed Result:**
+
+```text
+Password for [WORKGROUP\htb-student]:
+Try "help" to get a list of possible commands.
+
+smb: \>
+```
+
+### Mistake — Firewall Block
+
+**What Was Tried:** With the share's permissions confirmed correct (`Everyone` group, `Read` access present), a connection attempt was still expected to work without further changes.
+
+**What Was Wrong:** The connection was actually being blocked at the network layer — not by SMB share permissions or NTFS permissions at all.
+
+**How It Was Realized:** The question was explicitly raised — *"What could potentially block us from accessing this share if all our entries are correct?"* — leading to the identification of **Windows Defender Firewall** as the blocking factor, specifically because the Linux-based attack host is not joined to the same Windows workgroup as the target.
+
+**Correct Solution:** Enable the appropriate predefined inbound firewall rule in Windows Defender Firewall's advanced security settings (rather than disabling the firewall outright, which is a common but poor practice in real environments).
+
+**Lesson Learned:** Correct SMB/NTFS permissions do not guarantee network-layer connectivity — firewall rules operate independently of both permission systems and must be checked separately when access unexpectedly fails.
+
+> Technical Note: Windows Defender Firewall enforces separate inbound/outbound rule sets per profile — **Public**, **Private**, and **Domain**. In a Windows Domain environment, these rules can be centrally managed via Group Policy (out of scope for this module).
+
+### Authentication Context — Workgroup vs. Domain
+
+> Concept: when a Windows system is part of a **workgroup**, netlogon requests are authenticated against that system's own local **SAM database**. When a Windows system is joined to a **Windows Domain**, netlogon requests are instead authenticated against the centralized **Active Directory** database. This distinction directly affects how and where the `htb-student` account's credentials are validated when connecting.
+
+### Mounting the Share Locally
+
+```bash
+sudo mount -t cifs -o username=htb-student,password=Academy_WinFun! //ipaddoftarget/"Company Data" /home/user/Desktop/
+```
+
+**Purpose:** Creates a local mount point on the Linux attack host's desktop, mapping directly to the remote SMB share.
+
+**If this fails:** verify command syntax first; if syntax is correct but it still fails, install the required package:
+
+```bash
+sudo apt-get install cifs-utils
+```
+
+> ⚠️ Data Accuracy Note: the password `Academy_WinFun!` appears explicitly in the module's own example mount command and is preserved here exactly as it appeared in the source material.
+
+### Monitoring Tools
+
+```cmd
+net share
+```
+
+**Observed Result:**
+
+```text
+Share name   Resource                        Remark
+
+-------------------------------------------------------------------------------
+C$           C:\                             Default share
+IPC$                                         Remote IPC
+ADMIN$       C:\WINDOWS                      Remote Admin
+Company Data C:\Users\htb-student\Desktop\Company Data
+
+The command completed successfully.
+```
+
+**Interpretation:** Confirms both the manually created `Company Data` share and Windows' default administrative shares (`C$`, `ADMIN$`, `IPC$`), reinforcing that `C:\` is shared automatically without manual setup.
+
+**Additional monitoring tools referenced:**
+- **Computer Management** — inspect Shares, Sessions, and Open Files; useful during incident response to understand how an SMB-related breach may have happened and what traces were left behind.
+- **Event Viewer** — Windows' logging utility; every action performed against the shared folder (creation, editing, access) generates log entries reviewable here.
+
+---
+
+## Mistake — Confusing Local Command Execution With Remote Access
+
+This is a separate conceptual issue from the firewall problem above, related to how remote access to the target actually works.
+
+### What Was Tried
+
+The goal was to get a shell on the Windows target as the `htb-student` user, such that running `whoami` would return `htb-student`. Without a Pwnbox available, the plan was to use the local Linux machine directly as the attack host — but there was uncertainty about how running a command locally could result in the target's identity being reflected.
+
+### What Was Wrong
+
+There was a misunderstanding that running `whoami` in the local Linux terminal could somehow "become" `htb-student` without first actually establishing a remote connection to the target. Running `whoami` locally will only ever return the **local Linux user**, regardless of any Windows credentials involved — because no connection to the target has been made at that point.
+
+### How It Was Realized
+
+The distinction was clarified directly: OpenVPN's only role is providing **network connectivity** to the HTB lab environment. It does not authenticate as any particular user on any particular machine. Becoming `htb-student` requires actually **authenticating to the target Windows machine itself**, through a remote access protocol — at which point `whoami`, run *inside that remote session*, would correctly reflect `htb-student`.
+
+### Approaches Considered
+
+**RDP (the module's intended method):**
+
+```bash
+xfreerdp /v:10.129.152.128 /u:htb-student /p:'YOUR_PASSWORD'
+```
+
+This provides a full GUI desktop session as `htb-student` directly.
+
+**Checking for an alternative shell-based method:**
+
+```bash
+nmap -Pn 10.129.152.128
+```
+
+**Purpose:** Enumerate open ports/services on the target to determine what remote access options actually exist, rather than assuming.
+
+**Ports checked for relevance:**
+
+| Port | Service | Relevance |
+|---|---|---|
+| 3389 | RDP | GUI remote desktop access |
+| 5985 | WinRM (HTTP) | PowerShell remoting |
+| 5986 | WinRM (HTTPS) | PowerShell remoting, encrypted |
+| 22 | SSH | Terminal-based remote shell (not enabled by default on Windows) |
+
+### A Further Attempted Command
+
+```bash
+ssh htb-student@10.129.152.128
+```
+
+**What This Command Actually Does:** Attempts an SSH login to the target IP as `htb-student` — it does **not** transform the local Linux shell into the target's identity by itself, and it will only work at all **if the SSH service is actually running and open on the target**.
+
+> Correction: Windows does not enable SSH access by default. Before attempting this command, the correct step is to explicitly verify the port is open:
+> ```bash
+> nmap -Pn -p 22 10.129.152.128
+> ```
+> If the result shows `22/tcp open ssh`, the SSH attempt is viable. If port 22 is closed or filtered, SSH cannot be used at all, and the module's intended access method — RDP on port 3389 — is the correct path instead.
+
+### Lesson Learned
+
+```text
+whoami (run locally, no connection made)     -> always shows the LOCAL Linux user
+ssh htb-student@<target>                     -> only works if port 22 is actually open on the target
+xfreerdp /v:<target> /u:htb-student /p:...   -> the module's intended, verified-working method
+
+Correct mental model:
+  OpenVPN  = network path to the HTB lab (connectivity only)
+  RDP/SSH/WinRM = actual authentication into the target machine
+  whoami inside that remote session = reflects the target's identity, not before
+```
+
+**Why this matters:** it is easy to conflate "I'm connected to the HTB VPN" with "I'm authenticated as the target user" — they are two entirely separate layers. Network connectivity (via VPN) only makes the target reachable; it does not authenticate anything. Confirming which remote access service is actually open (via `nmap`) before attempting a specific protocol avoids wasted attempts against closed ports.
+
+---
+
+## Technical Concepts Recap
+
+- **NTFS permissions apply everywhere** the resource is accessed (locally, RDP, or via SMB); **share permissions apply only over SMB** — both stack together for network access, but only NTFS matters for local/RDP access.
+- Windows automatically shares `C:\` as `C$` at install — this is a default, not a manual misconfiguration, but it is still a real remote access surface.
+- Windows Defender Firewall operates independently of file-level permissions — a fully correct permission configuration can still be blocked at the network layer.
+- Workgroup authentication uses the local SAM database; Domain authentication uses Active Directory — this determines where credentials are actually validated.
+- Network connectivity (VPN) and target authentication (RDP/SSH/WinRM) are separate layers — reaching a target's network does not equate to being logged into it.
+
+---
+
+## Key Takeaways
+
+- The NTFS vs. share permission distinction is not academic — it directly determines which access path (local/RDP vs. SMB) a given permission setting actually controls.
+- Default Windows administrative shares (`C$`, `ADMIN$`, `IPC$`) exist without manual configuration and represent a meaningful default attack surface on any Windows host.
+- Firewall behavior must be diagnosed separately from permission configuration when access unexpectedly fails.
+
+## Biggest Mistakes
+
+1. Assuming correct share/NTFS permissions alone would guarantee SMB connectivity, without accounting for Windows Defender Firewall as a separate blocking layer.
+2. Conflating VPN network connectivity with target authentication — expecting a local `whoami` to somehow reflect a remote target user without first establishing an actual authenticated session.
+
+## Most Important Discoveries
+
+- `smbclient -L` revealing the default `C$`/`ADMIN$`/`IPC$` shares alongside the manually created share — highlighting that `C:\` is shared by default.
+- Explicitly running `nmap -Pn` to check for 3389/5985/5986/22 before assuming any specific remote access protocol would work, rather than guessing.
+
+## Quick Reference
+
+```bash
+smbclient -L SERVER_IP -U htb-student                          :: list available shares
+smbclient '\\SERVER_IP\Share Name' -U htb-student               :: connect to a specific share
+sudo apt-get install cifs-utils                                  :: required package for CIFS mounts
+sudo mount -t cifs -o username=U,password=P //IP/"Share" /path/  :: mount an SMB share locally
+net share                                                         :: (on target) list shares, including default admin shares
+nmap -Pn <target>                                                 :: check open ports before choosing a remote access method
+nmap -Pn -p 22 <target>                                           :: verify SSH is actually open before attempting ssh
+xfreerdp /v:<target> /u:<user> /p:'<password>'                    :: correct, module-intended remote access method
+```
+
+## Final Attack Chain (Access & Enumeration Chain)
+
+```text
+[Theory: NTFS vs Share permissions understood]
+              |
+              v
+[Share "Company Data" created on Windows 10 target, Everyone:Read]
+              |
+              v
+[smbclient -L from Linux host -- shares enumerated]
+              |
+              v
+[smbclient connection attempt -- BLOCKED]
+              |
+              v
+[Diagnosed as Windows Defender Firewall, not a permission issue]
+              |
+              v
+[Inbound firewall rule enabled -- connection succeeds]
+              |
+              v
+[Share mounted locally via cifs]
+              |
+              v
+[net share / Computer Management / Event Viewer used to review activity]
+              |
+              v
+[Separate question: how to get an htb-student shell without Pwnbox]
+              |
+              v
+[Misunderstanding: local whoami expected to reflect target identity]
+              |
+              v
+[Corrected: VPN = connectivity only, authentication is separate]
+              |
+              v
+[nmap used to confirm which remote access ports are actually open]
+              |
+              v
+[RDP via xfreerdp confirmed as the correct, intended access method]
+```
+
+## What This Exercise Taught
+
+Two independent lessons emerged from this session. First, permissions and network reachability are separate concerns — a correctly configured share can still be completely unreachable due to firewall rules, and diagnosing "access denied" style problems requires checking both layers independently rather than assuming a single cause. Second, remote access itself has layers that are easy to conflate: VPN connectivity gets you *to* a network, but actually becoming a specific user on a specific machine requires an authenticated protocol session (RDP, SSH, or WinRM) — and confirming which of those protocols is actually available, via direct port enumeration, is more reliable than assuming a particular method will work.
+
+.
+.
+..
+
+
+<div align="center">
+
+#   Windows Registry
+
+###   "Introduction to Windows" Learning Series
+
+`Theory: Registry Structure` -> `regedit GUI Practice` -> `reg.exe Command Line` -> `UAC Enumeration`
+
+</div>
+
+---
+
+## Overview
+
+This section covers the Windows Registry — its structure, the five main hives, how to browse and modify it through `regedit.exe`, and how to query, add, and delete Registry data from the command line using `reg.exe`. It closes with using the Registry to safely enumerate whether UAC (User Account Control) is enabled on a system.
+
+> Note: This section is theory and guided-practice focused. No target output had yet been captured or shared within this conversation, so no mistakes or corrections are documented here — the practical commands below were assigned as the next hands-on step, to be run and reviewed afterward.
+
+---
+
+## Objective
+
+1. Understand what the Windows Registry is and why it matters for both administration and security.
+2. Learn the Registry's structural hierarchy: Hive -> Key -> Subkey -> Value.
+3. Know the five major Registry hives and what each one governs.
+4. Practice creating and modifying Registry entries safely using `regedit.exe`.
+5. Learn to query, add, and delete Registry data using `reg.exe` from the command line.
+6. Use the Registry to safely check whether UAC is enabled, without modifying anything.
+
+---
+
+## Foundation & Theory
+
+### What Is the Windows Registry?
+
+The Windows Registry is a **hierarchical database** where Windows itself, and every installed application, stores its configuration and settings.
+
+It can contain information about:
+
+- User profiles
+- Software
+- Hardware
+- Services
+- Security policies
+- Operating system settings
+
+```text
+Windows
+   |
+   +-- Registry
+         |-- User settings
+         |-- Software settings
+         |-- Hardware settings
+         |-- Services
+         `-- Security policies
+```
+
+> Real-World Understanding: two concrete examples were used to make this concept tangible. First, when Windows needs to decide which application should start automatically after a user logs in, that configuration lives in the Registry. Second, whether a particular security feature is enabled or disabled on the system is also typically a Registry-stored setting. This is exactly why the Registry matters for both system administration and security work — it is the single place where "how is this machine configured to behave" actually lives.
+
+### Why Modifying the Registry Requires Care
+
+The Registry holds critical system configuration. An incorrect change can have real consequences:
+
+```text
+Wrong Registry change
+        |
+        v
+Application/system component
+        |
+        v
+May stop working
+```
+
+**Guidance carried from the module:** understand what a setting actually does before changing it, and ideally test changes in a lab environment first. This mirrors a broader cybersecurity habit: **read-only enumeration first, modification only when necessary and understood.**
+
+### Registry Structure
+
+The Registry can be mentally modeled the same way as a filesystem:
+
+```text
+Registry
+   |
+   v
+ Hive
+   |
+   v
+  Key
+   |
+   v
+Subkey
+   |
+   v
+ Value
+```
+
+| Level | Analogy | Description |
+|---|---|---|
+| **Hive** | Drive letter | Top-level section of the Registry |
+| **Key** | Folder | A container inside a hive |
+| **Subkey** | Subfolder | A key nested inside another key |
+| **Value** | File contents | The actual configuration setting |
+
+### Worked Example — Reading a Registry Path
+
+```text
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion
+```
+
+| Segment | Role |
+|---|---|
+| `HKEY_LOCAL_MACHINE` | Hive |
+| `SOFTWARE` | Key |
+| `Microsoft` | Subkey |
+| `Windows` | Subkey |
+| `CurrentVersion` | Subkey |
+
+Selecting `CurrentVersion` in the Registry Editor displays its associated values in the right-hand pane.
+
+### The Three Parts of a Registry Value
+
+Every Registry value consists of:
+
+| Part | Meaning |
+|---|---|
+| **Name** | The name of the setting |
+| **Type** | What kind of data it holds |
+| **Data** | The actual configuration content |
+
+**Example:**
+
+| Name | Type | Data |
+|---|---|---|
+| `CourseName` | `REG_SZ` | `Windows Fundamentals` |
+
+### The Five Major Registry Hives
+
+| Hive | Short Form | Purpose |
+|---|---|---|
+| `HKEY_CURRENT_USER` | HKCU | Settings for the currently logged-in user |
+| `HKEY_LOCAL_MACHINE` | HKLM | System-wide settings |
+| `HKEY_CLASSES_ROOT` | HKCR | File associations / application registration |
+| `HKEY_USERS` | HKU | All loaded user profiles |
+| `HKEY_CURRENT_CONFIG` | HKCC | Current hardware configuration |
+
+> Concept — HKCU vs. HKLM: this is the single most important distinction in this section. `HKCU` governs the current user only, while `HKLM` governs the entire computer. As a rule, `HKLM` changes typically require administrative privileges, while a standard user can generally modify the parts of `HKCU` relevant to their own account without elevation. This split maps directly onto later privilege-escalation reasoning: a Registry key that a low-privileged user can write to under `HKLM` (rather than the expected `HKCU`-only access) can be a meaningful security finding.
+
+### Registry Data Types
+
+| Type | Meaning |
+|---|---|
+| `REG_SZ` | Normal text/string |
+| `REG_DWORD` | 32-bit number |
+| `REG_QWORD` | 64-bit number |
+| `REG_MULTI_SZ` | Multiple strings |
+| `REG_BINARY` | Raw binary data |
+
+Quick reference for the three most commonly encountered types:
+
+```text
+REG_SZ    -> String
+REG_DWORD -> 32-bit number
+REG_QWORD -> 64-bit number
+```
+
+---
+
+## Practical — Registry Editor (GUI)
+
+`regedit.exe` is the built-in graphical tool for browsing and modifying the Registry.
+
+**Opening it:**
+
+- Start Menu -> type `regedit`
+
+or:
+
+```text
+Win + R
+   |
+   v
+regedit
+   |
+   v
+Enter
+```
+
+**Layout:**
+
+- **Left pane** — the Registry hierarchy (hives, keys, subkeys)
+- **Right pane** — the values contained in whatever is selected on the left
+- **Address bar** — shows the full current Registry path
+
+### Guided Practice Key
+
+Rather than modifying an existing system setting, the module's safe practice exercise is to create a brand-new key:
+
+**Navigate to:**
+
+```text
+HKEY_CURRENT_USER\Software
+```
+
+**Create a new key:**
+
+```text
+HTB-Academy
+```
+
+**Inside it, create two values:**
+
+| Value Name | Type | Data |
+|---|---|---|
+| `CourseName` | String Value | `Windows Fundamentals` |
+| `LabComplete` | DWORD (32-bit) Value | `1` |
+
+**Purpose:** This exercise is designed specifically to make the Hive -> Key -> Value -> Type -> Data hierarchy tangible through hands-on practice, using a safe, newly created key rather than risking any existing system configuration.
+
+---
+
+## Practical — reg.exe (Command Line)
+
+`reg.exe` allows querying and modifying the Registry directly from the command line.
+
+```cmd
+reg /?
+```
+
+**Purpose:** Lists available operations, including:
+
+```text
+QUERY
+ADD
+DELETE
+COPY
+SAVE
+LOAD
+UNLOAD
+RESTORE
+COMPARE
+EXPORT
+IMPORT
+FLAGS
+```
+
+The module highlights `query`, `add`, `delete`, `export`, and `import` as the most commonly used operations.
+
+### reg query — Reading Registry Data
+
+```cmd
+reg query "HKCU\Software\HTB-Academy"
+```
+
+**Purpose:** Reads and displays the contents of a Registry key.
+
+**Expected output (based on the practice key created above):**
+
+```text
+HKEY_CURRENT_USER\Software\HTB-Academy
+    CourseName      REG_SZ       Windows Fundamentals
+    LabComplete     REG_DWORD    0x1
+```
+
+**Interpretation:**
+
+```text
+CourseName  -> REG_SZ    -> Windows Fundamentals
+LabComplete -> REG_DWORD -> 1   (displayed in output as 0x1, hexadecimal)
+```
+
+### Querying a Specific Value
+
+```cmd
+reg query "HKCU\Software\HTB-Academy" /v CourseName
+```
+
+**Purpose:** `/v` restricts the query to a single named value instead of listing everything under the key.
+
+### Important reg query Options
+
+| Option | Purpose |
+|---|---|
+| `/v ValueName` | Query a specific value |
+| `/ve` | Query the default/empty value |
+| `/s` | Recurse through all subkeys and values (conceptually similar to `dir /s`) |
+| `/f` | Search for a data/pattern match |
+| `/k` | Search within key names |
+| `/d` | Search within data |
+| `/c` | Case-sensitive search |
+| `/e` | Exact matches only |
+| `/t` | Restrict to a specific Registry data type |
+| `/reg:32` | Use the 32-bit Registry view |
+| `/reg:64` | Use the 64-bit Registry view |
+
+### reg add — Creating or Modifying Values
+
+```cmd
+reg add "HKCU\Software\HTB-Academy" /v CreatedBy /t REG_SZ /d "reg.exe" /f
+```
+
+**Breakdown:**
+
+| Part | Meaning |
+|---|---|
+| `reg add` | Add a new value, or modify an existing one |
+| `/v CreatedBy` | The value's name |
+| `/t REG_SZ` | The value's data type |
+| `/d "reg.exe"` | The actual data to store |
+| `/f` | Skip the confirmation prompt |
+
+**Modifying an existing value** uses the exact same command structure:
+
+```cmd
+reg add "HKCU\Software\HTB-Academy" /v LabComplete /t REG_DWORD /d 0 /f
+```
+
+This changes `LabComplete`'s data from `1` to `0`. Verify the change afterward with:
+
+```cmd
+reg query "HKCU\Software\HTB-Academy"
+```
+
+### reg delete — Removing Registry Data
+
+**Deleting a single value only:**
+
+```cmd
+reg delete "HKCU\Software\HTB-Academy" /v CreatedBy /f
+```
+
+**Deleting an entire key (and everything inside it):**
+
+```cmd
+reg delete "HKCU\Software\HTB-Academy" /f
+```
+
+**The critical difference:**
+
+```text
+/v CreatedBy         -> deletes only that one value
+/f without /v         -> deletes the entire key and all its values
+```
+
+> Warning: `/f` bypasses the confirmation prompt entirely — the target path must be checked carefully before running any `reg delete` command with `/f`. The module explicitly warns that an incorrect Registry deletion can cause serious system damage.
+
+---
+
+## Registry Permissions
+
+Registry keys carry their own permission model — not every user can modify every key.
+
+```text
+HKCU -> Current user settings -> generally easier for the current user to modify
+HKLM -> System-wide settings  -> usually requires elevated/administrative privileges
+```
+
+Attempting an action without sufficient permission typically produces one of:
+
+```text
+Access is denied
+```
+
+or:
+
+```text
+The requested operation requires elevation
+```
+
+---
+
+## UAC — User Account Control
+
+**UAC (User Account Control)** exists to require approval before applications can make administrative-level changes to a system.
+
+**Relevant Registry path:**
+
+```text
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+```
+
+**Key value:**
+
+| Value | Type | Meaning |
+|---|---|---|
+| `EnableLUA` | `REG_DWORD` | `1` = UAC enabled, `0` = UAC disabled |
+
+### Safely Checking UAC Status (Read-Only)
+
+```cmd
+reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA
+```
+
+**Example output:**
+
+```text
+EnableLUA    REG_DWORD    0x1
+```
+
+**Interpretation:** `0x1` means UAC is currently enabled.
+
+> Technical Note: this command is a pure read/query operation — nothing on the system is being modified by running it. Actually changing UAC's state requires administrative privileges and normally a system restart, and the module specifically restricts disabling UAC to an isolated lab environment rather than a production or shared system.
+
+---
+
+## Cybersecurity Perspective
+
+The Registry matters to both sides of an assessment.
+
+**Attacker perspective** — the Registry can be enumerated for information about:
+
+- OS settings
+- User settings
+- Installed software
+- Services
+- Security configuration
+- UAC status
+
+**Defender perspective** — suspicious Registry modifications are a key investigative target, especially around:
+
+- Changed security settings
+- Changed startup/autorun configuration
+- Suspicious software configuration entries
+- Changed UAC settings
+
+> Concept: the Registry should be mentally modeled as Windows' own configuration database — anyone trying to understand how a machine is set up to behave, whether for legitimate administration, offense, or defense, ends up looking here.
+
+---
+
+## Complete Mental Model
+
+```text
+Windows Registry
+       |
+       +-- Hives
+       |     |-- HKCU
+       |     |-- HKLM
+       |     |-- HKCR
+       |     |-- HKU
+       |     `-- HKCC
+       |
+       +-- Keys
+       |
+       +-- Subkeys
+       |
+       `-- Values
+             |-- Name
+             |-- Type
+             `-- Data
+```
+
+**Command-line mapping:**
+
+```text
+reg
+ |
+ +-- query  -> Read
+ +-- add    -> Create/Modify
+ `-- delete -> Delete
+```
+
+---
+
+## Assigned Practical Steps
+
+The following read-only commands were assigned to be run against the actual HTB Windows target, with outputs to be reviewed afterward for hive/key/value/type/data identification:
+
+```cmd
+reg query "HKCU\Software"
+reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA
+reg /?
+```
+
+> Note: These commands were assigned as the next hands-on step in this learning session. Their actual outputs had not yet been captured or reviewed within this conversation, so no interpretation of live target data is documented here — this will be added once those outputs are available.
+
+---
+
+## Technical Concepts Recap
+
+- The Registry follows a strict hierarchy: **Hive -> Key -> Subkey -> Value**, and every value carries a **Name**, **Type**, and **Data**.
+- `HKCU` governs the current user; `HKLM` governs the entire machine and typically requires elevated privileges to modify.
+- `REG_SZ` (string), `REG_DWORD` (32-bit number), and `REG_QWORD` (64-bit number) are the most commonly encountered data types.
+- `reg query`, `reg add`, and `reg delete` map directly to Read, Create/Modify, and Delete operations on the Registry from the command line.
+- `EnableLUA` under `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System` controls whether UAC is enabled (`1`) or disabled (`0`), and can be safely checked with a read-only `reg query`.
+
+---
+
+## Quick Reference
+
+```cmd
+regedit                                                                    :: open Registry Editor GUI
+reg /?                                                                     :: list reg.exe operations
+
+reg query "HKCU\Software\HTB-Academy"                                      :: read all values under a key
+reg query "HKCU\Software\HTB-Academy" /v CourseName                        :: read one specific value
+
+reg add "HKCU\Software\HTB-Academy" /v CreatedBy /t REG_SZ /d "reg.exe" /f  :: add/modify a value
+reg add "HKCU\Software\HTB-Academy" /v LabComplete /t REG_DWORD /d 0 /f     :: modify an existing DWORD value
+
+reg delete "HKCU\Software\HTB-Academy" /v CreatedBy /f                      :: delete one value only
+reg delete "HKCU\Software\HTB-Academy" /f                                   :: delete entire key + values (use with care)
+
+reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA   :: check UAC status (read-only)
+```
+
+**Hive quick map:** `HKCU` current user · `HKLM` whole machine · `HKCR` file associations · `HKU` all loaded profiles · `HKCC` current hardware config
+
+**Data type quick map:** `REG_SZ` string · `REG_DWORD` 32-bit · `REG_QWORD` 64-bit · `REG_MULTI_SZ` multiple strings · `REG_BINARY` raw binary
+
+---
+
+## What This Section Taught
+
+The Registry is Windows' single source of truth for configuration — and its structure (Hive -> Key -> Subkey -> Value, each value carrying a Name/Type/Data triplet) is what makes it possible to reason about *any* Windows setting, from UAC to startup behavior to security policy, using the exact same mental model and the exact same three commands (`query`, `add`, `delete`). The recurring caution around `/f` and HKLM-level changes reinforces a theme already seen elsewhere in this module: read-only enumeration comes first, and modification is only done once the target setting, its scope, and its potential impact are fully understood.

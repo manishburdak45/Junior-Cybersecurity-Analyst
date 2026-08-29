@@ -1,8 +1,8 @@
 <div align="center">
 
-# HTB Academy — Windows Services, Service Permissions & Sessions
+#  Windows Services, Service Permissions & Sessions
 
-### Section 6 of the "Introduction to Windows" Learning Series
+###  of the "Introduction to Windows" Learning Series
 
 `Services Fundamentals` -> `sc.exe Enumeration` -> `Service Security Descriptors (SDDL)` -> `Get-Acl (ACL/SID)` -> `Interactive vs Non-Interactive Sessions`
 

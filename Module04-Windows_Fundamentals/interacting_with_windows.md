@@ -1108,3 +1108,504 @@ Get-Help      -> PowerShell help
 ## What This Section Taught
 
 Every part of this section builds toward one transferable skill: converting a question's wording into the exact command needed to answer it. GUI and RDP established *how* a human or remote operator interacts with Windows at all; CMD introduced the base command-line interaction model and its self-documenting `help`/`/?` pattern; PowerShell introduced the far more powerful Verb-Noun cmdlet system built on objects and pipelines; aliases and `Get-Help` showed how to navigate that system even without memorizing every cmdlet; and Execution Policy closed the loop with a specific, important security lesson — that a policy meant to prevent *accidental* script execution is trivially bypassed by anyone willing to set it for their own process scope, and should never be mistaken for a real security control.
+
+
+
+.
+.
+.
+..
+
+.
+
+<div align="center">
+
+# Windows Management Instrumentation (WMI)
+
+###  "Introduction to Windows" Learning Series (Consolidated)
+
+`WMI Theory & Components` -> `WMIC Command Line` -> `PowerShell: Get-WmiObject / Invoke-WmiMethod` -> `Practical Question Solved`
+
+</div>
+
+---
+
+## Overview
+
+This document consolidates the full WMI section: what WMI is and how it's architected, interacting with it from the command line via `WMIC`, interacting with it from PowerShell via `Get-WmiObject` and `Invoke-WmiMethod`, and a worked practical question (finding a system's serial number via WMI) that was solved and answered within this learning series.
+
+> Note: This document also revisits and properly explains the `Get-WmiObject -Class win32_OperatingSystem | select Version,BuildNumber` command that was run against the actual HTB target much earlier in this series (Section 1) — at that point it was used without full explanation of what each piece did; this section closes that loop.
+
+---
+
+## Objective
+
+1. Understand what WMI is, its purpose, and its core architectural components.
+2. Learn to interact with WMI from the command line using `WMIC`, including its alias/verb/adverb structure.
+3. Learn to interact with WMI from PowerShell using `Get-WmiObject` and `Invoke-WmiMethod`.
+4. Understand WMI's dual relevance to both Blue Team (monitoring/investigation) and Red Team (enumeration/lateral movement) work.
+5. Apply this knowledge to solve a real question: finding a system's serial number via WMI.
+
+---
+
+## Part 1 — WMI Foundation & Theory
+
+### What Is WMI?
+
+**WMI (Windows Management Instrumentation)** is a subsystem that provides system administrators with powerful tools for system monitoring. Its goal is to **consolidate device and application management across corporate networks**. WMI is a core part of the Windows operating system and has come pre-installed since **Windows 2000**.
+
+### WMI Components
+
+| Component | Description |
+|---|---|
+| **WMI service** | The core WMI process, running automatically at boot, acting as an intermediary between WMI providers, the WMI repository, and managing applications |
+| **Managed objects** | Any logical or physical component that WMI can manage |
+| **WMI providers** | Objects that monitor events/data related to a specific object |
+| **Classes** | Used by WMI providers to pass data to the WMI service |
+| **Methods** | Attached to classes; allow actions to be performed (e.g., starting/stopping processes on remote machines) |
+| **WMI repository** | A database storing all static data related to WMI |
+| **CIM Object Manager** | Requests data from WMI providers and returns it to the requesting application |
+| **WMI API** | Enables applications to access the WMI infrastructure |
+| **WMI Consumer** | Sends queries to objects via the CIM Object Manager |
+
+### What WMI Is Used For
+
+- Status information for local/remote systems
+- Configuring security settings on remote machines/applications
+- Setting and changing user and group permissions
+- Setting/modifying system properties
+- Code execution
+- Scheduling processes
+- Setting up logging
+
+These tasks can be performed through a combination of PowerShell and the **WMI Command-Line Interface (WMIC)**.
+
+---
+
+## Part 2 — WMIC (Command Line)
+
+### What Is WMIC?
+
+**WMIC = Windows Management Instrumentation Command-line.** It is the interface for interacting with WMI directly from the Command Prompt.
+
+```text
+WMI -> WMIC -> WMI information/operations from CMD
+```
+
+WMIC can be run in two ways:
+
+```cmd
+wmic
+```
+
+Opens an interactive WMIC shell, or a command can be run directly, such as:
+
+```cmd
+wmic computersystem get name
+```
+
+### WMIC Help
+
+```cmd
+wmic /?
+```
+
+**Output:**
+
+```text
+WMIC is deprecated.
+
+[global switches] <command>
+
+The following global switches are available:
+/NAMESPACE           Path for the namespace the alias operate against.
+/ROLE                Path for the role containing the alias definitions.
+/NODE                Servers the alias will operate against.
+/IMPLEVEL            Client impersonation level.
+/AUTHLEVEL           Client authentication level.
+/LOCALE              Language id the client should use.
+/PRIVILEGES          Enable or disable all privileges.
+/TRACE               Outputs debugging information to stderr.
+/RECORD              Logs all input commands and output.
+/INTERACTIVE         Sets or resets the interactive mode.
+/FAILFAST            Sets or resets the FailFast mode.
+/USER                User to be used during the session.
+/PASSWORD            Password to be used for session login.
+/OUTPUT              Specifies the mode for output redirection.
+/APPEND              Specifies the mode for output redirection.
+/AGGREGATE           Sets or resets aggregate mode.
+/AUTHORITY           Specifies the <authority type> for the connection.
+/?[:<BRIEF|FULL>]    Usage information.
+```
+
+> Technical Note: **"WMIC is deprecated"** means Microsoft no longer recommends it for future use — newer Windows administration favors PowerShell/WMI APIs directly. However, understanding WMIC remains useful for fundamentals and for working with older Windows environments.
+
+Global switches worth recognizing at this stage without memorizing in depth: `/NODE`, `/USER`, `/PASSWORD`, `/OUTPUT`, `/RECORD`, `/TRACE`, `/?`.
+
+### wmic computersystem get name
+
+```cmd
+wmic computersystem get name
+```
+
+Retrieves the computer's hostname/name.
+
+```text
+wmic -> computersystem -> get -> name
+```
+
+**Meaning:** "retrieve the `name` property from the `computersystem` object."
+
+**Question-decoding:** "Which WMIC command retrieves the computer name?" -> clues "computer name" + "retrieve" -> `wmic computersystem get name`.
+
+### wmic os list brief
+
+```cmd
+wmic os list brief
+```
+
+Displays basic operating system information.
+
+**Example output:**
+
+```text
+BuildNumber  Organization  RegisteredUser  SerialNumber             SystemDirectory      Version
+19041                      Owner           00123-00123-00123-AAOEM  C:\Windows\system32  10.0.19041
+```
+
+> Note: this output's `Version` (`10.0.19041`) and `BuildNumber` (`19041`) directly match what was previously observed via `Get-WmiObject` on the actual HTB target in Section 1 of this series — the same underlying data, retrieved through a different interface (WMIC here, versus PowerShell's `Get-WmiObject` there).
+
+### GET vs. LIST
+
+| Verb | Function |
+|---|---|
+| **GET** | Retrieve a specific property |
+| **LIST** | Show/list information about an object |
+
+```text
+wmic computersystem get name  -> GET: a specific property
+wmic os list brief             -> LIST: general information, filtered by adverb
+```
+
+### BRIEF (Adverb)
+
+```cmd
+wmic os list brief
+```
+
+`BRIEF` limits output to core/basic properties only.
+
+```text
+LIST  = verb (show/list data)
+BRIEF = adverb (only core/basic properties)
+```
+
+### WMIC's Structure
+
+```text
+wmic
+  |
+  v
+ALIAS
+  |
+  v
+VERB
+  |
+  v
+ADVERB / SWITCH
+```
+
+**Worked example — `wmic os list brief`:**
+
+| Segment | Role |
+|---|---|
+| `wmic` | WMIC itself |
+| `os` | Alias (represents a WMI class/object) |
+| `list` | Verb |
+| `brief` | Adverb |
+
+> Technical Note: WMIC's "aliases" (e.g., `computersystem`, `os`) are a different concept from PowerShell aliases (e.g., `ls` for `Get-ChildItem`) — in WMIC, an alias represents a WMI class/object being targeted, not a shortcut for a cmdlet name.
+
+### Cybersecurity Relevance of WMIC/WMI
+
+WMI/WMIC can be used for system information, remote systems, configuration, permissions, processes, and logging — making it directly relevant to a security analyst or pentester, who should be able to recognize:
+
+```text
+wmic -> WMI interaction -> System information / management
+```
+
+Later material in this learning path uses WMI in the context of enumeration and lateral movement.
+
+### Question-Decoding Practice
+
+| Question | Answer |
+|---|---|
+| "Which command displays the hostname?" | `wmic computersystem get name` |
+| "Which WMIC command displays basic operating system information?" | `wmic os list brief` |
+| "Which WMIC option displays help?" | `wmic /?` |
+
+### GET vs. LIST — Critical Distinction
+
+```text
+GET  -> Specific property retrieval    (e.g., wmic computersystem get name)
+LIST -> Object information listing     (e.g., wmic os list brief)
+BRIEF -> Core/basic properties only (adverb, used with LIST)
+```
+
+### Part 2 Cheat Sheet
+
+```text
+wmic                          -> Interactive WMIC shell
+wmic /?                       -> WMIC help
+wmic computersystem get name  -> Computer/hostname
+wmic os list brief            -> Basic OS information
+
+GET   -> Retrieve property
+LIST  -> List information
+BRIEF -> Core/basic properties
+```
+
+**Question-solving formula:**
+
+```text
+Question -> WMIC mentioned? -> Identify the object -> Identify the property/action -> GET or LIST? -> BRIEF/switch if needed
+```
+
+---
+
+## Part 3 — WMI via PowerShell: Get-WmiObject
+
+### The Cmdlet
+
+```powershell
+Get-WmiObject -Class <ClassName>
+```
+
+**Example:**
+
+```powershell
+Get-WmiObject -Class Win32_OperatingSystem
+```
+
+| Segment | Meaning |
+|---|---|
+| `Get-WmiObject` | Retrieve information from WMI |
+| `-Class` | Which WMI class to target |
+| `Win32_OperatingSystem` | The operating system information class |
+
+### Revisiting the Command Used Earlier in This Series
+
+The following command was run against the actual HTB target much earlier (Section 1):
+
+```powershell
+Get-WmiObject -Class win32_OperatingSystem | select Version,BuildNumber
+```
+
+**Output at the time:**
+
+```text
+Version      BuildNumber
+-------      -----------
+10.0.19041   19041
+```
+
+**Now fully explained, piece by piece:**
+
+| Segment | Function |
+|---|---|
+| `Get-WmiObject` | Retrieve WMI information |
+| `-Class Win32_OperatingSystem` | Target the OS class |
+| `\|` | Pipe output forward |
+| `select Version,BuildNumber` | Keep only these two properties |
+
+> Note: this closes the loop on a command that was used correctly early in this learning series without a full breakdown at the time — now that WMI, WMIC, and `Get-WmiObject` have all been covered, every piece of that original command is fully understood.
+
+### Win32_OperatingSystem
+
+This WMI class provides Windows operating system information. Example broader query:
+
+```powershell
+Get-WmiObject -Class Win32_OperatingSystem | select SystemDirectory,BuildNumber,SerialNumber,Version
+```
+
+**Example output:**
+
+```text
+SystemDirectory     BuildNumber SerialNumber            Version
+---------------     ----------- ------------            -------
+C:\Windows\system32 19041       00123-00123-00123-AAOEM 10.0.19041
+```
+
+**Properties available from this class include:** `SystemDirectory`, `BuildNumber`, `SerialNumber`, `Version`.
+
+---
+
+## Part 4 — WMI via PowerShell: Invoke-WmiMethod
+
+### Beyond Reading — Taking Action
+
+WMI is not limited to reading information — WMI classes expose **methods** that can perform actions. The PowerShell cmdlet for this is:
+
+```powershell
+Invoke-WmiMethod
+```
+
+**Meaning:** invoke/call a method on a WMI object.
+
+### Worked Example — Renaming a File
+
+```powershell
+Invoke-WmiMethod -Path "CIM_DataFile.Name='C:\users\public\spns.csv'" -Name Rename -ArgumentList "C:\Users\Public\kerberoasted_users.csv"
+```
+
+**Output:**
+
+```text
+__GENUS          : 2
+__CLASS          : __PARAMETERS
+__SUPERCLASS     :
+__DYNASTY        : __PARAMETERS
+__RELPATH        :
+__PROPERTY_COUNT : 1
+__DERIVATION     : {}
+__SERVER         :
+__NAMESPACE      :
+__PATH           :
+ReturnValue      : 0
+PSComputerName   :
+```
+
+**Command structure:**
+
+| Segment | Meaning |
+|---|---|
+| `Invoke-WmiMethod` | Execute a WMI method |
+| `-Path` | Target WMI object |
+| `CIM_DataFile.Name='...'` | The specific file object being targeted |
+| `-Name Rename` | The method being called (Rename) |
+| `-ArgumentList` | The new filename |
+
+### ReturnValue
+
+```text
+ReturnValue : 0 -> Operation completed successfully
+```
+
+> Note: the exact example filenames used here (`spns.csv` renamed to `kerberoasted_users.csv`) hint at a Kerberoasting-related workflow, though this specific section's material focused purely on the mechanics of `Invoke-WmiMethod` itself, not on Kerberoasting as an attack technique.
+
+---
+
+## Cybersecurity Perspective
+
+WMI's power comes from being usable against both local and remote systems, making it relevant to both sides of security work.
+
+**Blue Team:**
+
+```text
+WMI -> System information -> Configuration -> Monitoring -> Investigation
+```
+
+**Red Team:**
+
+Later material in this learning path uses WMI for:
+
+```text
+Enumeration + Lateral Movement
+```
+
+WMI is simultaneously a legitimate administration mechanism and a significant attack surface/technique — recognizing both sides is the point of this section.
+
+---
+
+## Complete WMI Cheat Sheet
+
+| Concept | Command/Meaning |
+|---|---|
+| WMI | Windows Management Instrumentation — Windows management/information framework |
+| WMIC | `wmic` — command-line interface for WMI |
+| WMIC help | `wmic /?` |
+| Computer name | `wmic computersystem get name` |
+| OS information | `wmic os list brief` |
+| PowerShell WMI read | `Get-WmiObject -Class Win32_OperatingSystem` -> retrieve information from a WMI class |
+| PowerShell WMI action | `Invoke-WmiMethod` -> call a method/action on a WMI object |
+
+### Final Mental Model
+
+```text
+                    WMI
+                     |
+          +----------+----------+
+          |                     |
+        WMIC                PowerShell
+          |                     |
+     +----+----+          +-----+------+
+     |         |          |            |
+   GET       LIST    Get-WmiObject  Invoke-WmiMethod
+     |         |          |            |
+ Information  List       Retrieve      Perform
+ (property)  (broader)  information     action
+```
+
+### Question-Decoding Practice
+
+| Question | Answer |
+|---|---|
+| "Get information about the operating system using WMI" | `Get-WmiObject -Class Win32_OperatingSystem` |
+| "Which command can retrieve the hostname using WMIC?" | `wmic computersystem get name` |
+| "Which WMIC option provides basic/core properties?" | `BRIEF` |
+| "Which PowerShell command invokes a WMI method?" | `Invoke-WmiMethod` |
+| "What does ReturnValue 0 indicate?" | Successful completion |
+
+---
+
+## Practical Question Solved — Finding the System Serial Number via WMI
+
+### The Question
+
+> "Use WMI to find the serial number of the system."
+
+### Reasoning Chain
+
+```text
+WMI                -> PowerShell equivalent: Get-WmiObject
+System/OS info      -> Class: Win32_OperatingSystem
+Serial number       -> Property: SerialNumber
+```
+
+### Command
+
+```powershell
+Get-WmiObject -Class Win32_OperatingSystem | Select-Object SerialNumber
+```
+
+**Short form (equivalent):**
+
+```powershell
+Get-WmiObject -Class Win32_OperatingSystem | select SerialNumber
+```
+
+### Expected Output Format
+
+```text
+SerialNumber
+------------
+00123-00123-00123-AAOEM
+```
+
+> Note: the actual `SerialNumber` value returned from the specific HTB target is what gets submitted as the answer — the value shown above is the module's illustrative example format, not a guaranteed match for every target.
+
+### Question-Solving Formula (Reusable Pattern)
+
+```text
+WMI            -> Get-WmiObject
+System/OS      -> Win32_OperatingSystem
+Serial number  -> SerialNumber
+```
+
+This exact pattern — identify the PowerShell cmdlet family (`Get-WmiObject`), identify the relevant class (`Win32_OperatingSystem`), identify the specific property needed (`SerialNumber`) — is the same reasoning chain used throughout this section for every WMI-related question, whether asked via WMIC or PowerShell.
+
+---
+
+## What This Section Taught
+
+WMI is one underlying framework accessible through two different interfaces — `WMIC` from the command line and `Get-WmiObject`/`Invoke-WmiMethod` from PowerShell — and the same information (OS version, build number, serial number, hostname) can be reached through either path. The recurring skill this section reinforced is decomposing any WMI-related question into three parts: which interface, which class/object, and which specific property or method — a reasoning chain flexible enough to answer questions about information never explicitly covered, simply by recognizing the pattern (as demonstrated directly in the serial number question, which required no new command syntax, only correctly reapplying `Get-WmiObject` + `Win32_OperatingSystem` with a different target property).

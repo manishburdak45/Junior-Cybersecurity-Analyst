@@ -1,6 +1,6 @@
 # Computer Networks
 
-## Week 1 | Chapter 1: Introduction to Computer Networks
+##  Chapter 1: Introduction to Computer Networks
 
 # Section A: Network Fundamentals
 
